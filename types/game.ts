@@ -14,6 +14,8 @@ export type Slot = 'A' | 'B';
 
 export type WinnerMode = 'AI_SCORE' | 'AUDIENCE_VOTE';
 
+export type RoomMode = 'DUEL' | 'TOURNAMENT';
+
 export interface PlayerSnapshot {
   nickname: string;
   submitted: boolean;
@@ -65,6 +67,7 @@ export interface StateSnapshot {
   audienceVotingEnabled?: boolean;
   audienceEnabled?: boolean;
   aiScoreEnabled?: boolean;
+  roomMode?: RoomMode;
 }
 
 export type Role = 'player' | 'audience' | 'stage' | 'admin';

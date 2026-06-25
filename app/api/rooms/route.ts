@@ -45,7 +45,8 @@ const CreateRoomBody = z.object({
   showPromptsAfterResult: z.boolean().default(true),
   showPromptsDuringWriting: z.boolean().default(false),
   rematchEnabled: z.boolean().default(true),
-  audienceVotingEnabled: z.boolean().default(false)
+  audienceVotingEnabled: z.boolean().default(false),
+  roomMode: z.enum(['DUEL', 'TOURNAMENT']).default('DUEL')
 });
 
 function _clientIp(req: Request): string {
