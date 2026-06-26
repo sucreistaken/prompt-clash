@@ -1,6 +1,6 @@
 'use client';
 
-import type { CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { useGameState } from './useGameState';
 import { useI18n } from './i18nContext';
 import { C, FONT, StageFonts, StageKeyframes } from '@/components/stage/atmosphere';
@@ -15,6 +15,7 @@ import type { DictKey } from '@/i18n/dict';
 export function ResultView() {
   const { state, mySlot } = useGameState();
   const { t, lang } = useI18n();
+  const [showDetails, setShowDetails] = useState(false);
 
   if (!state) return null;
 
@@ -85,18 +86,7 @@ export function ResultView() {
               winnerMetric={winnerMetric}
               loserMetric={loserMetric}
               aiMode={aiMode}
-            />
-          )}
-          {truePromptText && <TrueBlock t={t} text={truePromptText} />}
-          {!isTie && winner && loser && (
-            <PromptRow
-              t={t}
-              winnerSlot={winnerSlot}
-              loserSlot={loserSlot}
-              winnerNick={winner.nickname}
-              loserNick={loser.nickname}
-              winnerPrompt={winner.prompt ?? ''}
-              loserPrompt={loser.prompt ?? ''}
+              truePrompt={truePromptText ?? ''}
             />
           )}
           {aiMode && state.aiReasoning && <AiReasoning t={t} text={state.aiReasoning} />}
@@ -118,19 +108,14 @@ export function ResultView() {
             </div>
             <HedefCornerMobile src={state.referenceImageUrl} alt={t('referenceImage')} label={t('audienceHedefShort')} />
           </div>
-          <ResultHero
-            t={t}
-            isTie={isTie}
-            winnerNick={winner?.nickname ?? ''}
-            winnerColor={winnerColor}
-            aiMode={aiMode}
-            compact
-          />
           {isTie ? (
-            <TieMobile t={t} state={state} aiMode={aiMode} />
+            <>
+              <ResultHero t={t} isTie winnerNick="" winnerColor={winnerColor} aiMode={aiMode} compact />
+              <TieMobile t={t} state={state} aiMode={aiMode} />
+            </>
           ) : (
             winner && winnerSlot && (
-              <WinnerCardMobile
+              <WinnerHeroMobile
                 t={t}
                 slot={winnerSlot}
                 nick={winner.nickname}
@@ -141,17 +126,49 @@ export function ResultView() {
               />
             )
           )}
-          {truePromptText && <TrueBlock t={t} text={truePromptText} compact />}
-          {!isTie && loser && loserSlot && (
-            <LoserRowMobile
-              slot={loserSlot}
-              nick={loser.nickname}
-              imageUrl={loser.imageUrl ?? null}
-              prompt={loser.prompt ?? ''}
-              metric={loserMetric}
-            />
-          )}
           {aiMode && state.aiReasoning && <AiReasoning t={t} text={state.aiReasoning} compact />}
+          {!isTie && (truePromptText || (loser && loserSlot)) && (
+            <div style={{ width: '100%', marginTop: 10 }}>
+              <button
+                type="button"
+                onClick={() => setShowDetails((v) => !v)}
+                aria-expanded={showDetails}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  padding: '8px 10px',
+                  background: 'transparent',
+                  border: `1px solid ${C.line}`,
+                  color: C.text3,
+                  fontFamily: FONT.mono,
+                  fontSize: 9.5,
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                }}
+              >
+                {t('resultDetailsToggle')}
+                <span style={{ fontSize: 11, lineHeight: 1 }}>{showDetails ? '▴' : '▾'}</span>
+              </button>
+              {showDetails && (
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+                  {truePromptText && <TrueBlock t={t} text={truePromptText} compact />}
+                  {loser && loserSlot && (
+                    <LoserRowMobile
+                      slot={loserSlot}
+                      nick={loser.nickname}
+                      imageUrl={loser.imageUrl ?? null}
+                      prompt={loser.prompt ?? ''}
+                      metric={loserMetric}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+          )}
           <Cta t={t} mySlot={mySlot} winnerColor={winnerColor} />
         </div>
       </main>
@@ -288,6 +305,7 @@ function WinnerArenaDesktop({
   winnerMetric,
   loserMetric,
   aiMode,
+  truePrompt,
 }: {
   t: (k: DictKey) => string;
   winnerSlot: Slot | null;
@@ -298,6 +316,7 @@ function WinnerArenaDesktop({
   winnerMetric: number | null;
   loserMetric: number | null;
   aiMode: boolean;
+  truePrompt?: string;
 }) {
   return (
     <div
@@ -323,12 +342,13 @@ function WinnerArenaDesktop({
               isWinner
               aiMode={aiMode}
               t={t}
+              prompt={winner.prompt ?? ''}
             />
           )}
         </div>
       </div>
       <div style={{ paddingTop: 18 }}>
-        <HedefBlockDesktop src={referenceUrl} alt={t('referenceImage')} label={t('audienceHedefShort')} />
+        <HedefBlockDesktop src={referenceUrl} alt={t('referenceImage')} label={t('audienceHedefShort')} truePrompt={truePrompt} truePromptLabel={t('truePromptLabel')} />
       </div>
       <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
         <div style={{ width: '100%', maxWidth: 280 }}>
@@ -341,6 +361,7 @@ function WinnerArenaDesktop({
               isWinner={false}
               aiMode={aiMode}
               t={t}
+              prompt={loser.prompt ?? ''}
             />
           )}
         </div>
@@ -357,6 +378,7 @@ function ArenaCardDesktop({
   isWinner,
   aiMode,
   t,
+  prompt,
 }: {
   slot: Slot;
   nick: string;
@@ -365,6 +387,7 @@ function ArenaCardDesktop({
   isWinner: boolean;
   aiMode: boolean;
   t: (k: DictKey) => string;
+  prompt?: string;
 }) {
   const slotColor = C.player(slot);
   return (
@@ -471,11 +494,42 @@ function ArenaCardDesktop({
           {metric ?? '—'}
         </span>
       </div>
+      {prompt !== undefined && (
+        <div
+          style={{
+            fontFamily: FONT.mono,
+            fontSize: 11,
+            lineHeight: 1.5,
+            color: isWinner ? C.text2 : C.text3,
+            borderLeft: `2px solid ${isWinner ? slotColor : C.line}`,
+            paddingLeft: 9,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            wordBreak: 'break-word',
+          }}
+        >
+          {prompt || '—'}
+        </div>
+      )}
     </div>
   );
 }
 
-function HedefBlockDesktop({ src, alt, label }: { src: string | null; alt: string; label: string }) {
+function HedefBlockDesktop({
+  src,
+  alt,
+  label,
+  truePrompt,
+  truePromptLabel,
+}: {
+  src: string | null;
+  alt: string;
+  label: string;
+  truePrompt?: string;
+  truePromptLabel?: string;
+}) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
       <span
@@ -517,6 +571,26 @@ function HedefBlockDesktop({ src, alt, label }: { src: string | null; alt: strin
           return <div key={pos} style={s} />;
         })}
       </div>
+      {truePrompt ? (
+        <div style={{ width: 240, display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
+          <span style={{ fontFamily: FONT.mono, fontSize: 8.5, letterSpacing: '0.20em', textTransform: 'uppercase', color: C.accent }}>{truePromptLabel}</span>
+          <span
+            style={{
+              fontFamily: FONT.mono,
+              fontSize: 11,
+              lineHeight: 1.5,
+              color: C.text2,
+              textAlign: 'center',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {truePrompt}
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -562,6 +636,146 @@ function HedefCornerMobile({ src, alt, label }: { src: string | null; alt: strin
   );
 }
 
+function WinnerHeroMobile({
+  t,
+  slot,
+  nick,
+  imageUrl,
+  prompt,
+  metric,
+  aiMode,
+}: {
+  t: (k: DictKey) => string;
+  slot: Slot;
+  nick: string;
+  imageUrl: string | null;
+  prompt: string;
+  metric: number | null;
+  aiMode: boolean;
+}) {
+  const slotColor = C.player(slot);
+  return (
+    <div style={{ marginTop: 12, width: '100%', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {/* Hero görsel + alttan overlay (isim + skor) — ayrı kutu yok */}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          flex: 1,
+          minHeight: 168,
+          overflow: 'hidden',
+          background: '#0e0d14',
+          borderLeft: `3px solid ${slotColor}`,
+        }}
+      >
+        {imageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={imageUrl}
+            alt={nick}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        )}
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            padding: '40px 14px 13px',
+            background: 'linear-gradient(to top, rgba(8,7,12,0.94) 0%, rgba(8,7,12,0.55) 52%, transparent 100%)',
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5, minWidth: 0 }}>
+            <span
+              style={{
+                fontFamily: FONT.pixel,
+                fontSize: 9,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: slotColor,
+              }}
+            >
+              {aiMode ? t('audienceWinnerHeroLabel') : t('winner')}
+            </span>
+            <span
+              style={{
+                fontFamily: FONT.pixel,
+                fontSize: 24,
+                letterSpacing: '0.04em',
+                lineHeight: 1,
+                color: C.bone,
+                wordBreak: 'break-word',
+              }}
+            >
+              {nick.toUpperCase()}
+            </span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
+            <span
+              style={{
+                fontFamily: FONT.pixel,
+                fontSize: 30,
+                lineHeight: 1,
+                color: slotColor,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {metric ?? '—'}
+            </span>
+            <span
+              style={{
+                fontFamily: FONT.mono,
+                fontSize: 8.5,
+                letterSpacing: '0.20em',
+                textTransform: 'uppercase',
+                color: C.text3,
+                marginTop: 3,
+              }}
+            >
+              {aiMode ? t('aiPoints') : t('votesShort')}
+            </span>
+          </div>
+        </div>
+      </div>
+      {/* Prompt — tek temiz satır, kutu yok */}
+      <div style={{ display: 'flex', gap: 9, alignItems: 'baseline' }}>
+        <span
+          style={{
+            fontFamily: FONT.mono,
+            fontSize: 8.5,
+            letterSpacing: '0.20em',
+            textTransform: 'uppercase',
+            color: slotColor,
+            flexShrink: 0,
+          }}
+        >
+          {t('promptLabel')}
+        </span>
+        <span
+          style={{
+            fontFamily: FONT.mono,
+            fontSize: 11,
+            lineHeight: 1.5,
+            color: C.text2,
+            overflow: 'hidden',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            wordBreak: 'break-word',
+          }}
+        >
+          {prompt || t('typing')}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function WinnerCardMobile({
   t,
   slot,
@@ -581,7 +795,7 @@ function WinnerCardMobile({
 }) {
   const slotColor = C.player(slot);
   return (
-    <div style={{ marginTop: 14, width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ marginTop: 14, width: '100%', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <span
           style={{
@@ -628,8 +842,8 @@ function WinnerCardMobile({
         style={{
           position: 'relative',
           width: '100%',
-          aspectRatio: '4 / 5',
-          maxHeight: '60dvh',
+          flex: 1,
+          minHeight: 104,
           background: '#0e0d14',
           overflow: 'hidden',
           border: `1.5px solid ${slotColor}`,
@@ -844,86 +1058,6 @@ function TrueBlock({ t, text, compact = false }: { t: (k: DictKey) => string; te
   );
 }
 
-function PromptRow({
-  t,
-  winnerSlot,
-  loserSlot,
-  winnerNick,
-  loserNick,
-  winnerPrompt,
-  loserPrompt,
-}: {
-  t: (k: DictKey) => string;
-  winnerSlot: Slot | null;
-  loserSlot: Slot | null;
-  winnerNick: string;
-  loserNick: string;
-  winnerPrompt: string;
-  loserPrompt: string;
-}) {
-  const winnerColor = winnerSlot ? C.player(winnerSlot) : C.line;
-  const loserColor = loserSlot ? C.player(loserSlot) : C.line;
-  const promptLabel = (name: string) => t('audiencePromptByTpl').replace('{name}', name.toUpperCase());
-  return (
-    <div
-      style={{
-        marginTop: 12,
-        width: '100%',
-        maxWidth: 1060,
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: 24,
-      }}
-    >
-      <PromptBox label={promptLabel(winnerNick)} text={winnerPrompt} color={winnerColor} dimmed={false} />
-      <PromptBox label={promptLabel(loserNick)} text={loserPrompt} color={loserColor} dimmed />
-    </div>
-  );
-}
-
-function PromptBox({ label, text, color, dimmed }: { label: string; text: string; color: string; dimmed: boolean }) {
-  return (
-    <div
-      style={{
-        padding: '11px 14px',
-        background: `color-mix(in srgb, ${color} 5%, transparent)`,
-        borderLeft: `2px solid ${color}`,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 6,
-        opacity: dimmed ? 0.55 : 1,
-        filter: dimmed ? 'grayscale(0.4)' : 'none',
-      }}
-    >
-      <span
-        style={{
-          fontFamily: FONT.mono,
-          fontSize: 9.5,
-          letterSpacing: '0.20em',
-          textTransform: 'uppercase',
-          color: C.text3,
-        }}
-      >
-        {label}
-      </span>
-      <span
-        style={{
-          fontFamily: FONT.mono,
-          fontSize: 11.5,
-          lineHeight: 1.5,
-          color: C.text,
-          overflow: 'hidden',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-        }}
-      >
-        {text || '—'}
-      </span>
-    </div>
-  );
-}
-
 function AiReasoning({ t, text, compact = false }: { t: (k: DictKey) => string; text: string; compact?: boolean }) {
   return (
     <div
@@ -975,15 +1109,27 @@ function Cta({ t, mySlot, winnerColor }: { t: (k: DictKey) => string; mySlot: Sl
       style={{
         marginTop: 'auto',
         paddingTop: 14,
-        fontFamily: FONT.mono,
-        fontSize: 11,
-        letterSpacing: '0.22em',
-        textTransform: 'uppercase',
-        color: C.text4,
-        textAlign: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 9,
       }}
     >
-      — {t('audienceNextMatchSoon')} —
+      <span
+        className="ac-live-dot"
+        style={{ width: 5, height: 5, borderRadius: '50%', background: C.accent, display: 'inline-block' }}
+      />
+      <span
+        style={{
+          fontFamily: FONT.mono,
+          fontSize: 10.5,
+          letterSpacing: '0.22em',
+          textTransform: 'uppercase',
+          color: C.text3,
+        }}
+      >
+        {t('audienceNextMatchSoon')}
+      </span>
     </div>
   );
 }
