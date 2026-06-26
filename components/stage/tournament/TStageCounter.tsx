@@ -98,8 +98,9 @@ export function TStageCounter() {
   const { t } = useI18n();
   if (!tournament) return null;
 
-  const { activeCount, totalCount, roster, topic, roundIndex, roundCount } = tournament;
+  const { activeCount, totalCount, roster, topic, roundIndex, roundCount, mode, groupPhase, currentGroupIndex, groupCount } = tournament;
   const railItems = buildRailItems(totalCount, roundIndex, roundCount);
+  const showGroupLabel = mode === 'B' && groupPhase && currentGroupIndex >= 0 && groupCount > 0;
 
   return (
     <StageFrame>
@@ -165,6 +166,32 @@ export function TStageCounter() {
         <Lbl size={14} color="text3">
           {t('tPromptRoundLabel').replace('{n}', String(roundIndex))}
         </Lbl>
+        {/* Mode B group label — shown during the group phase, near KALAN counter */}
+        {showGroupLabel && (
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '4px 14px',
+              background: 'rgba(174,210,74,0.12)',
+              border: '1.5px solid rgba(174,210,74,0.40)',
+              alignSelf: 'flex-start',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: FONT.mono,
+                fontSize: 14,
+                fontWeight: 700,
+                color: '#aed24a',
+                letterSpacing: '0.08em',
+              }}
+            >
+              {t('tStageGroupLabel')} {currentGroupIndex + 1} / {groupCount}
+            </span>
+          </div>
+        )}
         <PixelText size={280} color={C.accent}>
           {activeCount}
         </PixelText>

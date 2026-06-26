@@ -537,6 +537,10 @@ export const dictionaries = {
     tGroupWaitTitle: 'Sıranı bekle',
     tGroupWaitBody: 'Grubun sahneye gelince yazacaksın',
     tGroupBadge: 'GRUP',
+
+    // ─── Tournament Mode B group labels (Task B5) ───
+    tStageGroupLabel: 'GRUP',
+    tBracketGroup: 'Grup',
   },
   en: {
     // ─── existing ───
@@ -1075,6 +1079,10 @@ export const dictionaries = {
     tGroupWaitTitle: 'Wait your turn',
     tGroupWaitBody: 'You write when your group is up',
     tGroupBadge: 'GROUP',
+
+    // ─── Tournament Mode B group labels (Task B5) ───
+    tStageGroupLabel: 'GROUP',
+    tBracketGroup: 'Group',
   },
 } as const;
 

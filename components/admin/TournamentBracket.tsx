@@ -25,8 +25,23 @@ export function TournamentBracket({ tournament }: { tournament: TournamentSnapsh
     return sb - sa;
   });
 
+  const showGroupLabel =
+    tournament.mode === 'B' &&
+    tournament.groupPhase &&
+    tournament.currentGroupIndex >= 0 &&
+    tournament.groupCount > 0;
+
   return (
     <div style={bracketWrapStyle}>
+      {/* Mode B group label — shown in bracket header during the group phase */}
+      {showGroupLabel && (
+        <div style={groupLabelRowStyle}>
+          <span style={groupLabelTextStyle}>
+            {t('tBracketGroup')} {tournament.currentGroupIndex + 1}/{tournament.groupCount}
+          </span>
+        </div>
+      )}
+
       {/* Champion row — gold, appears when tournament is over */}
       {tournament.champion ? (
         <div style={championRowStyle}>
@@ -285,4 +300,22 @@ const emptyRosterStyle: CSSProperties = {
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 12.5,
   color: 'var(--pc-text4)',
+};
+
+const groupLabelRowStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  padding: '6px 10px',
+  borderRadius: 8,
+  background: 'rgba(174,210,74,0.10)',
+  border: '1px solid rgba(174,210,74,0.30)',
+};
+
+const groupLabelTextStyle: CSSProperties = {
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: '#aed24a',
 };
