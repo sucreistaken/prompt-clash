@@ -14,7 +14,8 @@ export type WaitVariant =
   | 'eliminated'
   | 'final'
   | 'complete'
-  | 'groupWait';
+  | 'groupWait'
+  | 'groupAdvanced';
 
 const variantToMascotVariant: Record<WaitVariant, 'default' | 'lime' | 'dim'> = {
   connecting: 'default',
@@ -24,6 +25,7 @@ const variantToMascotVariant: Record<WaitVariant, 'default' | 'lime' | 'dim'> = 
   final: 'default',
   complete: 'default',
   groupWait: 'default',
+  groupAdvanced: 'lime',
 };
 
 export function TWaiting({ variant }: { variant: WaitVariant }) {
@@ -38,6 +40,7 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
     final: t('tWaitFinal'),
     complete: t('tWaitComplete'),
     groupWait: t('tGroupWaitBody'),
+    groupAdvanced: t('tGroupAdvancedBody'),
   };
 
   const msg = msgKey[variant];
@@ -45,9 +48,9 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
     ? tournament.champion.nickname
     : null;
 
-  // Group-wait: derive group number from myEntrant
+  // Group-wait / group-advanced: derive group number from myEntrant
   const groupNum =
-    variant === 'groupWait' && myEntrant?.groupIndex != null
+    (variant === 'groupWait' || variant === 'groupAdvanced') && myEntrant?.groupIndex != null
       ? myEntrant.groupIndex + 1
       : null;
 
@@ -57,7 +60,7 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
     <>
       <StageFonts />
       <StageKeyframes />
-      <BgAtmosphere variant={variant === 'eliminated' ? 'danger' : variant === 'watching' || variant === 'groupWait' ? 'lime' : 'default'} />
+      <BgAtmosphere variant={variant === 'eliminated' ? 'danger' : variant === 'watching' || variant === 'groupWait' || variant === 'groupAdvanced' ? 'lime' : 'default'} />
       <main
         style={{
           position: 'relative',
@@ -137,6 +140,41 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
               }}
             >
               {t('tGroupWaitTitle')}
+            </div>
+          )}
+
+          {/* Group-advanced: group badge */}
+          {variant === 'groupAdvanced' && groupNum != null && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '4px 12px',
+                borderRadius: 999,
+                border: `1px solid var(--pc-b)`,
+                background: 'rgba(174,210,74,0.10)',
+                fontFamily: FONT.mono,
+                fontSize: 11,
+                color: 'var(--pc-b)',
+                letterSpacing: '0.14em',
+              }}
+            >
+              {t('tGroupBadge')} {groupNum}
+            </div>
+          )}
+
+          {/* Group-advanced: lime positive title */}
+          {variant === 'groupAdvanced' && (
+            <div
+              style={{
+                fontFamily: FONT.pixel,
+                fontSize: 22,
+                color: 'var(--pc-b)',
+                letterSpacing: '0.06em',
+                lineHeight: 1.2,
+              }}
+            >
+              {t('tGroupAdvancedTitle')}
             </div>
           )}
 

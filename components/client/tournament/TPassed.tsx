@@ -22,7 +22,7 @@ export function TPassed() {
   const activeCount = tournament?.activeCount ?? 0;
   const totalCount = tournament?.totalCount ?? 0;
   const groupNum =
-    tournament?.mode === 'B' && myEntrant?.groupIndex != null
+    tournament?.mode === 'B' && tournament?.groupPhase && myEntrant?.groupIndex != null
       ? myEntrant.groupIndex + 1
       : null;
 

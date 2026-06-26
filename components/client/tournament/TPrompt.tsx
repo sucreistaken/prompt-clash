@@ -31,7 +31,7 @@ export function TPrompt() {
   const topic = tournament?.topic?.promptTr ?? '';
   const roundLabel = `${t('tPromptRoundLabel').replace('{n}', String((tournament?.roundIndex ?? 0) + 1))}`;
   const groupNum =
-    tournament?.mode === 'B' && myEntrant?.groupIndex != null
+    tournament?.mode === 'B' && tournament?.groupPhase && myEntrant?.groupIndex != null
       ? myEntrant.groupIndex + 1
       : null;
   const empty = text.trim().length === 0;

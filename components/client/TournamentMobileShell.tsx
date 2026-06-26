@@ -15,6 +15,9 @@ import { TChampion } from './tournament/TChampion';
  * Task 8a built: TJoin (LOBBY) + TPrompt (ROUND_PROMPTING active).
  * Task 8b adds: TPassed (ROUND_CUT survivor) + TEliminated (eliminated) +
  *               TFinalVote (FINAL_DUEL) + TChampion (COMPLETE).
+ *
+ * Final review fix: distinguish "already advanced, waiting" (groupAdvanced)
+ * from "your group hasn't run yet" (groupWait) in all group-phase branches.
  */
 export function TournamentMobileShell() {
   const { tournament: t, myEntrant } = useGameState();
@@ -22,28 +25,36 @@ export function TournamentMobileShell() {
   if (!t) return <TWaiting variant="connecting" />;
 
   const eliminated = !!myEntrant?.eliminated;
+  // Group-phase helpers — only active when mode B + groupPhase flag
+  const groupPhaseB = t.mode === 'B' && t.groupPhase;
+  const myGroupActive = myEntrant != null && myEntrant.groupIndex === t.currentGroupIndex;
+  const alreadyCompeted = myEntrant != null && myEntrant.lastScore != null;
 
   switch (t.phase) {
     case 'LOBBY':
       return <TJoin />;
 
     case 'ROUND_PROMPTING': {
-      const inActiveGroup =
-        !(t.mode === 'B' && t.groupPhase) ||
-        (myEntrant != null && myEntrant.groupIndex === t.currentGroupIndex);
-      if (myEntrant && !eliminated && inActiveGroup) return <TPrompt />;
+      // Non-active-group entrants during the group phase get a tailored waiting screen
+      if (groupPhaseB && myEntrant && !eliminated && !myGroupActive)
+        return <TWaiting variant={alreadyCompeted ? 'groupAdvanced' : 'groupWait'} />;
+      if (myEntrant && !eliminated) return <TPrompt />;
       if (eliminated) return <TEliminated />;
-      if (t.mode === 'B' && t.groupPhase && myEntrant && myEntrant.groupIndex !== t.currentGroupIndex)
-        return <TWaiting variant="groupWait" />;
       return <TWaiting variant="watching" />;
     }
 
     case 'ROUND_GENERATING':
     case 'ROUND_SCORING':
-      return eliminated ? <TEliminated /> : <TWaiting variant="scoring" />;
+      if (eliminated) return <TEliminated />;
+      if (groupPhaseB && myEntrant && !myGroupActive)
+        return <TWaiting variant={alreadyCompeted ? 'groupAdvanced' : 'groupWait'} />;
+      return <TWaiting variant="scoring" />;
 
     case 'ROUND_CUT':
-      return eliminated ? <TEliminated /> : <TPassed />;
+      if (eliminated) return <TEliminated />;
+      if (groupPhaseB && myEntrant && !myGroupActive)
+        return <TWaiting variant={alreadyCompeted ? 'groupAdvanced' : 'groupWait'} />;
+      return <TPassed />;
 
     case 'FINAL_DUEL':
       return <TFinalVote />;

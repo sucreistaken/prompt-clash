@@ -537,6 +537,8 @@ export const dictionaries = {
     tGroupWaitTitle: 'Sıranı bekle',
     tGroupWaitBody: 'Grubun sahneye gelince yazacaksın',
     tGroupBadge: 'GRUP',
+    tGroupAdvancedTitle: 'Geçtin!',
+    tGroupAdvancedBody: 'Diğer gruplar yarışıyor — üst tura kaldın',
 
     // ─── Tournament Mode B group labels (Task B5) ───
     tStageGroupLabel: 'GRUP',
@@ -1079,6 +1081,8 @@ export const dictionaries = {
     tGroupWaitTitle: 'Wait your turn',
     tGroupWaitBody: 'You write when your group is up',
     tGroupBadge: 'GROUP',
+    tGroupAdvancedTitle: 'You advanced!',
+    tGroupAdvancedBody: 'Other groups are competing — you reached the next round',
 
     // ─── Tournament Mode B group labels (Task B5) ───
     tStageGroupLabel: 'GROUP',
