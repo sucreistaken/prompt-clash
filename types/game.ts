@@ -28,6 +28,28 @@ export interface PlayerSnapshot {
   ready?: boolean;
 }
 
+export interface TournamentEntrantSnapshot {
+  entrantId: string;
+  nickname: string;
+  eliminated: boolean;
+  lastScore: number | null;
+}
+export interface TournamentRef {
+  entrantId: string;
+  nickname: string;
+}
+export interface TournamentSnapshot {
+  phase: string;
+  roundIndex: number;
+  roundCount: number;
+  activeCount: number;
+  totalCount: number;
+  topic: { promptTr: string } | null;
+  champion: TournamentRef | null;
+  finalists: TournamentRef[] | null;
+  roster: TournamentEntrantSnapshot[];
+}
+
 export interface StateSnapshot {
   phase: Phase;
   phaseEndsAt: number | null;
@@ -68,6 +90,7 @@ export interface StateSnapshot {
   audienceEnabled?: boolean;
   aiScoreEnabled?: boolean;
   roomMode?: RoomMode;
+  tournament?: TournamentSnapshot | null;
 }
 
 export type Role = 'player' | 'audience' | 'stage' | 'admin';
