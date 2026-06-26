@@ -35,6 +35,7 @@ export interface TournamentEntrantSnapshot {
   nickname: string;
   eliminated: boolean;
   lastScore: number | null;
+  groupIndex: number | null;
 }
 export interface TournamentRef {
   entrantId: string;
@@ -51,6 +52,9 @@ export interface TournamentSnapshot {
   finalists: TournamentRef[] | null;
   roster: TournamentEntrantSnapshot[];
   mode: TournamentMode;
+  groupPhase: boolean;
+  currentGroupIndex: number;
+  groupCount: number;
 }
 
 export interface StateSnapshot {

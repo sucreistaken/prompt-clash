@@ -27,10 +27,16 @@ export function TournamentMobileShell() {
     case 'LOBBY':
       return <TJoin />;
 
-    case 'ROUND_PROMPTING':
-      return myEntrant && !eliminated
-        ? <TPrompt />
-        : (eliminated ? <TEliminated /> : <TWaiting variant="watching" />);
+    case 'ROUND_PROMPTING': {
+      const inActiveGroup =
+        !(t.mode === 'B' && t.groupPhase) ||
+        (myEntrant != null && myEntrant.groupIndex === t.currentGroupIndex);
+      if (myEntrant && !eliminated && inActiveGroup) return <TPrompt />;
+      if (eliminated) return <TEliminated />;
+      if (t.mode === 'B' && t.groupPhase && myEntrant && myEntrant.groupIndex !== t.currentGroupIndex)
+        return <TWaiting variant="groupWait" />;
+      return <TWaiting variant="watching" />;
+    }
 
     case 'ROUND_GENERATING':
     case 'ROUND_SCORING':

@@ -532,6 +532,11 @@ export const dictionaries = {
     tModeAHint: 'Herkes aynı konu, global sıralama',
     tModeB: 'Eleme Grupları',
     tModeBHint: 'Gruplar sırayla yarışır + wildcard',
+
+    // ─── Tournament Mode B group UI (Task B4) ───
+    tGroupWaitTitle: 'Sıranı bekle',
+    tGroupWaitBody: 'Grubun sahneye gelince yazacaksın',
+    tGroupBadge: 'GRUP',
   },
   en: {
     // ─── existing ───
@@ -1065,6 +1070,11 @@ export const dictionaries = {
     tModeAHint: 'Everyone same topic, global ranking',
     tModeB: 'Group Elimination',
     tModeBHint: 'Groups compete in turns + wildcard',
+
+    // ─── Tournament Mode B group UI (Task B4) ───
+    tGroupWaitTitle: 'Wait your turn',
+    tGroupWaitBody: 'You write when your group is up',
+    tGroupBadge: 'GROUP',
   },
 } as const;
 

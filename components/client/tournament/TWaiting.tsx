@@ -13,7 +13,8 @@ export type WaitVariant =
   | 'scoring'
   | 'eliminated'
   | 'final'
-  | 'complete';
+  | 'complete'
+  | 'groupWait';
 
 const variantToMascotVariant: Record<WaitVariant, 'default' | 'lime' | 'dim'> = {
   connecting: 'default',
@@ -22,10 +23,11 @@ const variantToMascotVariant: Record<WaitVariant, 'default' | 'lime' | 'dim'> = 
   eliminated: 'dim',
   final: 'default',
   complete: 'default',
+  groupWait: 'default',
 };
 
 export function TWaiting({ variant }: { variant: WaitVariant }) {
-  const { tournament } = useGameState();
+  const { tournament, myEntrant } = useGameState();
   const { t } = useI18n();
 
   const msgKey: Record<WaitVariant, string> = {
@@ -35,6 +37,7 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
     eliminated: t('tWaitEliminated'),
     final: t('tWaitFinal'),
     complete: t('tWaitComplete'),
+    groupWait: t('tGroupWaitBody'),
   };
 
   const msg = msgKey[variant];
@@ -42,13 +45,19 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
     ? tournament.champion.nickname
     : null;
 
+  // Group-wait: derive group number from myEntrant
+  const groupNum =
+    variant === 'groupWait' && myEntrant?.groupIndex != null
+      ? myEntrant.groupIndex + 1
+      : null;
+
   const mascotVariant = variantToMascotVariant[variant];
 
   return (
     <>
       <StageFonts />
       <StageKeyframes />
-      <BgAtmosphere variant={variant === 'eliminated' ? 'danger' : variant === 'watching' ? 'lime' : 'default'} />
+      <BgAtmosphere variant={variant === 'eliminated' ? 'danger' : variant === 'watching' || variant === 'groupWait' ? 'lime' : 'default'} />
       <main
         style={{
           position: 'relative',
@@ -94,6 +103,40 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
               }}
             >
               {champName}
+            </div>
+          )}
+
+          {/* Group-wait: group badge + title */}
+          {variant === 'groupWait' && groupNum != null && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '4px 12px',
+                borderRadius: 999,
+                border: `1px solid var(--pc-b)`,
+                background: 'rgba(174,210,74,0.10)',
+                fontFamily: FONT.mono,
+                fontSize: 11,
+                color: 'var(--pc-b)',
+                letterSpacing: '0.14em',
+              }}
+            >
+              {t('tGroupBadge')} {groupNum}
+            </div>
+          )}
+
+          {variant === 'groupWait' && (
+            <div
+              style={{
+                fontFamily: FONT.pixel,
+                fontSize: 22,
+                color: C.text,
+                letterSpacing: '0.06em',
+                lineHeight: 1.2,
+              }}
+            >
+              {t('tGroupWaitTitle')}
             </div>
           )}
 

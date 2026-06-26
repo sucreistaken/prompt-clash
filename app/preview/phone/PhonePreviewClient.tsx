@@ -39,9 +39,11 @@ function PreviewInner() {
   if (mode === 'tournament') {
     const tphase = params.get('tphase') || 'ROUND_PROMPTING';
     const elim = params.get('elim') === '1';
+    const tmode = params.get('tmode') ?? undefined;
+    const groupWait = params.get('groupwait') === '1';
     return (
       <I18nProvider forceLang="tr">
-        <GameCtx.Provider value={mockTournamentCtx(tphase, { eliminated: elim, theme })}>
+        <GameCtx.Provider value={mockTournamentCtx(tphase, { eliminated: elim, theme, tmode, groupWait })}>
           <MobileShell />
         </GameCtx.Provider>
       </I18nProvider>

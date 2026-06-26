@@ -21,6 +21,10 @@ export function TPassed() {
   const score = myEntrant?.lastScore ?? null;
   const activeCount = tournament?.activeCount ?? 0;
   const totalCount = tournament?.totalCount ?? 0;
+  const groupNum =
+    tournament?.mode === 'B' && myEntrant?.groupIndex != null
+      ? myEntrant.groupIndex + 1
+      : null;
 
   return (
     <>
@@ -95,6 +99,26 @@ export function TPassed() {
           >
             {t('tPassedRound').replace('{n}', String(roundNum))}
           </div>
+
+          {/* Mode B group badge */}
+          {groupNum != null && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '4px 12px',
+                borderRadius: 999,
+                border: `1px solid ${C.bColor}`,
+                background: 'rgba(174,210,74,0.10)',
+                fontFamily: FONT.mono,
+                fontSize: 11,
+                color: C.bColor,
+                letterSpacing: '0.14em',
+              }}
+            >
+              {t('tGroupBadge')} {groupNum}
+            </div>
+          )}
 
           {/* Score card */}
           {score !== null && (

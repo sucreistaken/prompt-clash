@@ -17,7 +17,7 @@ import { useI18n } from '../i18nContext';
  * - After submit: locked confirmation card
  */
 export function TPrompt() {
-  const { state, tournament, submitTournamentPrompt } = useGameState();
+  const { state, tournament, myEntrant, submitTournamentPrompt } = useGameState();
   const { t } = useI18n();
   const [text, setText] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -30,6 +30,10 @@ export function TPrompt() {
 
   const topic = tournament?.topic?.promptTr ?? '';
   const roundLabel = `${t('tPromptRoundLabel').replace('{n}', String((tournament?.roundIndex ?? 0) + 1))}`;
+  const groupNum =
+    tournament?.mode === 'B' && myEntrant?.groupIndex != null
+      ? myEntrant.groupIndex + 1
+      : null;
   const empty = text.trim().length === 0;
   const isLast10 = cd.value <= 10 && cd.value > 0 && !submitted;
   const counterWarn = text.length >= 250;
@@ -71,23 +75,43 @@ export function TPrompt() {
             gap: 12,
           }}
         >
-          {/* Round pill */}
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 7,
-              padding: '5px 11px',
-              borderRadius: 999,
-              border: `1px solid ${C.live}`,
-              background: 'rgba(255,92,92,0.10)',
-              fontFamily: FONT.mono,
-              fontSize: 11,
-              color: C.live,
-              letterSpacing: '0.10em',
-            }}
-          >
-            {roundLabel}
+          {/* Round pill + optional group badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 7,
+                padding: '5px 11px',
+                borderRadius: 999,
+                border: `1px solid ${C.live}`,
+                background: 'rgba(255,92,92,0.10)',
+                fontFamily: FONT.mono,
+                fontSize: 11,
+                color: C.live,
+                letterSpacing: '0.10em',
+              }}
+            >
+              {roundLabel}
+            </div>
+            {groupNum != null && (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '4px 10px',
+                  borderRadius: 999,
+                  border: `1px solid var(--pc-b)`,
+                  background: 'rgba(174,210,74,0.10)',
+                  fontFamily: FONT.mono,
+                  fontSize: 11,
+                  color: 'var(--pc-b)',
+                  letterSpacing: '0.12em',
+                }}
+              >
+                {t('tGroupBadge')} {groupNum}
+              </div>
+            )}
           </div>
 
           {/* Timer */}

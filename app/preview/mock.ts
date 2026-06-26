@@ -145,14 +145,17 @@ export function mockGameCtx(
  * Mock tournament context for /preview/phone?mode=tournament.
  * Provides a believable TournamentSnapshot at the given phase.
  * `opts.eliminated` simulates the local player being knocked out.
+ * `opts.tmode='B'` + `opts.groupWait` simulate Mode B group-phase.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mockTournamentCtx(
   tphase: string,
-  opts: { eliminated?: boolean; theme?: 'dark' | 'light' } = {},
+  opts: { eliminated?: boolean; theme?: 'dark' | 'light'; tmode?: string; groupWait?: boolean } = {},
 ): any {
   const theme = opts.theme ?? 'dark';
   const eliminated = opts.eliminated ?? false;
+  const isModeB = opts.tmode === 'B';
+  const groupWait = isModeB && (opts.groupWait ?? false);
 
   // Use a duel phase for countdown plumbing (phaseEndsAt lives on state).
   const basePhase: Phase = tphase === 'ROUND_PROMPTING' ? 'PROMPTING' : 'IDLE';
@@ -161,25 +164,50 @@ export function mockTournamentCtx(
   state.roomMode = 'TOURNAMENT';
   state.phaseEndsAt = tphase === 'ROUND_PROMPTING' ? Date.now() + 22_000 : null;
 
-  const roster: TournamentEntrantSnapshot[] = [
-    { entrantId: 'e1',  nickname: 'ayşe_x',  eliminated: false, lastScore: 90 },
-    { entrantId: 'e2',  nickname: 'mert',     eliminated: false, lastScore: 84 },
-    { entrantId: 'e3',  nickname: 'zeynep',   eliminated: false, lastScore: 86 },
-    { entrantId: 'e4',  nickname: 'elif',     eliminated: false, lastScore: 82 },
-    { entrantId: 'e5',  nickname: 'cem',      eliminated: true,  lastScore: 78 },
-    { entrantId: 'e6',  nickname: 'nur',      eliminated: true,  lastScore: 70 },
-    { entrantId: 'e7',  nickname: 'kaan',     eliminated: true,  lastScore: 72 },
-    { entrantId: 'me',  nickname: 'sen',      eliminated,        lastScore: eliminated ? 74 : 88 },
-    // Extended roster for a visually fuller wall on stage
-    { entrantId: 'e9',  nickname: 'burak',    eliminated: true,  lastScore: 65 },
-    { entrantId: 'e10', nickname: 'defne',    eliminated: false, lastScore: 81 },
-    { entrantId: 'e11', nickname: 'tarık',    eliminated: true,  lastScore: 68 },
-    { entrantId: 'e12', nickname: 'selin',    eliminated: false, lastScore: 79 },
-    { entrantId: 'e13', nickname: 'yusuf',    eliminated: true,  lastScore: 62 },
-    { entrantId: 'e14', nickname: 'hande',    eliminated: false, lastScore: 77 },
-    { entrantId: 'e15', nickname: 'berk',     eliminated: true,  lastScore: 60 },
-    { entrantId: 'e16', nickname: 'melis',    eliminated: true,  lastScore: 66 },
-  ];
+  // For Mode B: 5 groups of 3 players each (15 total) + local player
+  // groupWait=true → local player is in group 1 (index 1), active group is 0
+  // groupWait=false → local player is in group 0 (index 0), active group is 0
+  const myGroupIndex = groupWait ? 1 : 0;
+  const currentGroupIndex = 0;
+  const groupCount = isModeB ? 5 : 0;
+
+  const roster: TournamentEntrantSnapshot[] = isModeB
+    ? [
+        { entrantId: 'e1',  nickname: 'ayşe_x',  eliminated: false, lastScore: 90,        groupIndex: 0 },
+        { entrantId: 'e2',  nickname: 'mert',     eliminated: false, lastScore: 84,        groupIndex: 0 },
+        { entrantId: 'e3',  nickname: 'zeynep',   eliminated: false, lastScore: 86,        groupIndex: 0 },
+        { entrantId: 'e4',  nickname: 'elif',     eliminated: false, lastScore: 82,        groupIndex: 1 },
+        { entrantId: 'e5',  nickname: 'cem',      eliminated: false, lastScore: 78,        groupIndex: 1 },
+        { entrantId: 'e6',  nickname: 'nur',      eliminated: false, lastScore: 70,        groupIndex: 1 },
+        { entrantId: 'e7',  nickname: 'kaan',     eliminated: false, lastScore: 72,        groupIndex: 2 },
+        { entrantId: 'e9',  nickname: 'burak',    eliminated: false, lastScore: 65,        groupIndex: 2 },
+        { entrantId: 'e10', nickname: 'defne',    eliminated: false, lastScore: 81,        groupIndex: 2 },
+        { entrantId: 'e11', nickname: 'tarık',    eliminated: false, lastScore: 68,        groupIndex: 3 },
+        { entrantId: 'e12', nickname: 'selin',    eliminated: false, lastScore: 79,        groupIndex: 3 },
+        { entrantId: 'e13', nickname: 'yusuf',    eliminated: false, lastScore: 62,        groupIndex: 3 },
+        { entrantId: 'e14', nickname: 'hande',    eliminated: false, lastScore: 77,        groupIndex: 4 },
+        { entrantId: 'e15', nickname: 'berk',     eliminated: false, lastScore: 60,        groupIndex: 4 },
+        { entrantId: 'e16', nickname: 'melis',    eliminated: false, lastScore: 66,        groupIndex: 4 },
+        { entrantId: 'me',  nickname: 'sen',      eliminated,        lastScore: eliminated ? 74 : 88, groupIndex: myGroupIndex },
+      ]
+    : [
+        { entrantId: 'e1',  nickname: 'ayşe_x',  eliminated: false, lastScore: 90,        groupIndex: null },
+        { entrantId: 'e2',  nickname: 'mert',     eliminated: false, lastScore: 84,        groupIndex: null },
+        { entrantId: 'e3',  nickname: 'zeynep',   eliminated: false, lastScore: 86,        groupIndex: null },
+        { entrantId: 'e4',  nickname: 'elif',     eliminated: false, lastScore: 82,        groupIndex: null },
+        { entrantId: 'e5',  nickname: 'cem',      eliminated: true,  lastScore: 78,        groupIndex: null },
+        { entrantId: 'e6',  nickname: 'nur',      eliminated: true,  lastScore: 70,        groupIndex: null },
+        { entrantId: 'e7',  nickname: 'kaan',     eliminated: true,  lastScore: 72,        groupIndex: null },
+        { entrantId: 'me',  nickname: 'sen',      eliminated,        lastScore: eliminated ? 74 : 88, groupIndex: null },
+        { entrantId: 'e9',  nickname: 'burak',    eliminated: true,  lastScore: 65,        groupIndex: null },
+        { entrantId: 'e10', nickname: 'defne',    eliminated: false, lastScore: 81,        groupIndex: null },
+        { entrantId: 'e11', nickname: 'tarık',    eliminated: true,  lastScore: 68,        groupIndex: null },
+        { entrantId: 'e12', nickname: 'selin',    eliminated: false, lastScore: 79,        groupIndex: null },
+        { entrantId: 'e13', nickname: 'yusuf',    eliminated: true,  lastScore: 62,        groupIndex: null },
+        { entrantId: 'e14', nickname: 'hande',    eliminated: false, lastScore: 77,        groupIndex: null },
+        { entrantId: 'e15', nickname: 'berk',     eliminated: true,  lastScore: 60,        groupIndex: null },
+        { entrantId: 'e16', nickname: 'melis',    eliminated: true,  lastScore: 66,        groupIndex: null },
+      ];
 
   const activeCount = roster.filter((e) => !e.eliminated).length;
   const isComplete = tphase === 'COMPLETE';
@@ -199,7 +227,10 @@ export function mockTournamentCtx(
       ? [{ entrantId: 'e1', nickname: 'ayşe_x' }, { entrantId: 'e2', nickname: 'mert' }]
       : null,
     roster,
-    mode: 'A',
+    mode: isModeB ? 'B' : 'A',
+    groupPhase: isModeB,
+    currentGroupIndex: isModeB ? currentGroupIndex : 0,
+    groupCount: isModeB ? groupCount : 0,
   };
 
   state.tournament = tournament;
