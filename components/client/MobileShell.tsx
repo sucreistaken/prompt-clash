@@ -56,9 +56,10 @@ function MobileShellInner() {
     );
   }
 
-  // Tournament mode — hand off entirely to the tournament shell.
-  // Do NOT alter the duel routing below.
-  if (state.roomMode === 'TOURNAMENT') return <TournamentMobileShell />;
+  // Tournament mode — hand off to the tournament shell, UNLESS this client is
+  // a finalist who has received a `joined_as` event (mySlot set) and therefore
+  // should participate in the final duel with the normal player UI (Fix A step 4).
+  if (state.roomMode === 'TOURNAMENT' && !mySlot) return <TournamentMobileShell />;
 
   // Active player flow
   if (mySlot) {

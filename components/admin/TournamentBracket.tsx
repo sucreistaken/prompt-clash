@@ -8,27 +8,11 @@
 
 import type { CSSProperties } from 'react';
 import { useI18n } from '@/components/client/i18nContext';
+import type { TournamentSnapshot } from '@/types/game';
 
-export type EntrantSlim = { entrantId: string; nickname: string };
-
-export type RosterEntry = {
-  entrantId: string;
-  nickname: string;
-  eliminated: boolean;
-  lastScore?: number | null;
-};
-
-export type TournamentSnapshot = {
-  phase: string;
-  roundIndex: number;
-  roundCount: number;
-  activeCount: number;
-  totalCount: number;
-  topic: { promptTr: string } | null;
-  champion: EntrantSlim | null;
-  finalists: EntrantSlim[] | null;
-  roster: RosterEntry[];
-};
+// Re-export the canonical type so existing importers (ControlPanelClient) can
+// continue importing from this file without changes (Fix C).
+export type { TournamentSnapshot };
 
 export function TournamentBracket({ tournament }: { tournament: TournamentSnapshot }) {
   const { t } = useI18n();
