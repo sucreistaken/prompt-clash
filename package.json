@@ -12,6 +12,7 @@
     "smoke:match": "node scripts/matchSmoke.js",
     "smoke:multi-room": "node scripts/multiRoomSmoke.js",
     "smoke:tournament": "node scripts/tournamentSmoke.js",
+    "smoke:tournament-socket": "node scripts/tournamentSocketSmoke.js",
     "i18n:check": "node scripts/i18nParityCheck.js"
   },
   "dependencies": {
