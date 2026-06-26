@@ -488,6 +488,23 @@ export const dictionaries = {
     tWaitWatching: 'Şu an izliyorsun.',
     tWaitComplete: 'Turnuva bitti!',
     tChampionIs: 'Şampiyon',
+
+    // ─── Tournament phone shell (Task 8b) — passed / eliminated / final-vote / champion ───
+    tPassedTitle: 'GEÇTİN!',
+    tPassedMascotLabel: 'HAYATTA KALDIN',
+    tPassedRound: 'TUR {n} GEÇTİ',
+    tPassedScore: 'SKORUN',
+    tPassedSurvivors: '{active} kişi turda kaldı · {total} başladı',
+    tPassedNext: 'Bir sonraki tura hazır ol!',
+    tElimTitle: 'ELENDİN — AMA…',
+    tElimBeat: '{n} kişiyi geride bıraktın',
+    tElimBeatZero: '{total} kişilik turnuvada harika iş çıkardın',
+    tElimWatch: 'Final oynamaya devam ediyor, izleyebilirsin.',
+    tElimShare: 'RUN\'INI PAYLAŞ',
+    tFinalVoteTitle: 'FİNAL DÜELLOSU',
+    tFinalVotePick: 'Kazanmasını istediğine oy ver',
+    tChampionTitle: 'TURNUVA ŞAMPİYONU',
+    tChampionCongrats: 'Tüm katılımcılar harika iş çıkardı. Bir dahaki yarışmada görüşmek üzere!',
   },
   en: {
     // ─── existing ───
@@ -977,6 +994,23 @@ export const dictionaries = {
     tWaitWatching: "You're watching now.",
     tWaitComplete: 'Tournament complete!',
     tChampionIs: 'Champion',
+
+    // ─── Tournament phone shell (Task 8b) — passed / eliminated / final-vote / champion ───
+    tPassedTitle: 'YOU PASSED!',
+    tPassedMascotLabel: 'SURVIVOR',
+    tPassedRound: 'ROUND {n} CLEARED',
+    tPassedScore: 'YOUR SCORE',
+    tPassedSurvivors: '{active} players remain · {total} started',
+    tPassedNext: 'Get ready for the next round!',
+    tElimTitle: 'ELIMINATED — BUT…',
+    tElimBeat: 'You outlasted {n} players',
+    tElimBeatZero: 'Great run in a {total}-player tournament',
+    tElimWatch: 'The finals are still going — you can keep watching.',
+    tElimShare: 'SHARE YOUR RUN',
+    tFinalVoteTitle: 'FINAL DUEL',
+    tFinalVotePick: 'Vote for who you want to win',
+    tChampionTitle: 'TOURNAMENT CHAMPION',
+    tChampionCongrats: 'Everyone played brilliantly. See you at the next tournament!',
   },
 } as const;
 

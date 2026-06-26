@@ -4,14 +4,17 @@ import { useGameState } from './useGameState';
 import { TJoin } from './tournament/TJoin';
 import { TPrompt } from './tournament/TPrompt';
 import { TWaiting } from './tournament/TWaiting';
+import { TPassed } from './tournament/TPassed';
+import { TEliminated } from './tournament/TEliminated';
+import { TFinalVote } from './tournament/TFinalVote';
+import { TChampion } from './tournament/TChampion';
 
 /**
  * Tournament phone shell — routes by tournament.phase.
  *
- * Task 8a builds: TJoin (LOBBY) + TPrompt (ROUND_PROMPTING active).
- * All other phases fall back to TWaiting so the shell never crashes.
- * Task 8b will replace several TWaiting branches with TPassed/TEliminated/
- * TFinalVote/TChampion — keep the switch shape.
+ * Task 8a built: TJoin (LOBBY) + TPrompt (ROUND_PROMPTING active).
+ * Task 8b adds: TPassed (ROUND_CUT survivor) + TEliminated (eliminated) +
+ *               TFinalVote (FINAL_DUEL) + TChampion (COMPLETE).
  */
 export function TournamentMobileShell() {
   const { tournament: t, myEntrant } = useGameState();
@@ -27,18 +30,20 @@ export function TournamentMobileShell() {
     case 'ROUND_PROMPTING':
       return myEntrant && !eliminated
         ? <TPrompt />
-        : <TWaiting variant={eliminated ? 'eliminated' : 'watching'} />;
+        : (eliminated ? <TEliminated /> : <TWaiting variant="watching" />);
 
     case 'ROUND_GENERATING':
     case 'ROUND_SCORING':
+      return eliminated ? <TEliminated /> : <TWaiting variant="scoring" />;
+
     case 'ROUND_CUT':
-      return <TWaiting variant={eliminated ? 'eliminated' : 'scoring'} />;
+      return eliminated ? <TEliminated /> : <TPassed />;
 
     case 'FINAL_DUEL':
-      return <TWaiting variant="final" />;
+      return <TFinalVote />;
 
     case 'COMPLETE':
-      return <TWaiting variant="complete" />;
+      return <TChampion />;
 
     default:
       return <TWaiting variant="connecting" />;
