@@ -16,6 +16,8 @@ export type WinnerMode = 'AI_SCORE' | 'AUDIENCE_VOTE';
 
 export type RoomMode = 'DUEL' | 'TOURNAMENT';
 
+export type TournamentMode = 'A' | 'B';
+
 export interface PlayerSnapshot {
   nickname: string;
   submitted: boolean;
@@ -48,6 +50,7 @@ export interface TournamentSnapshot {
   champion: TournamentRef | null;
   finalists: TournamentRef[] | null;
   roster: TournamentEntrantSnapshot[];
+  mode: TournamentMode;
 }
 
 export interface StateSnapshot {

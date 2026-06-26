@@ -13,12 +13,13 @@ import { AppHeader } from '@/components/common/AppHeader';
 import { BackLink } from '@/components/common/BackLink';
 import { BgAtmosphere } from '@/components/common/BgAtmosphere';
 import { MascotFrame } from '@/components/common/MascotFrame';
-import type { RoomMode } from '@/types/game';
+import type { RoomMode, TournamentMode } from '@/types/game';
 
 type CategoryMode = 'RANDOM' | 'HOST_SELECTED' | 'PLAYER_VOTE';
 
 type RoomDraft = {
   roomMode: RoomMode;
+  tournamentMode: TournamentMode;
   categoryMode: CategoryMode;
   audienceEnabled: boolean;
   promptDuration: number;
@@ -32,6 +33,7 @@ type RoomDraft = {
 
 const DEFAULTS: RoomDraft = {
   roomMode: 'DUEL',
+  tournamentMode: 'A',
   categoryMode: 'RANDOM',
   audienceEnabled: true,
   promptDuration: 60,
@@ -165,6 +167,46 @@ function CreateRoomBody() {
               <span style={rowDescStyle}>{t('modeTournamentHint')}</span>
             )}
           </div>
+
+          {/* tournamentMode segmented — only visible when TOURNAMENT is selected */}
+          {draft.roomMode === 'TOURNAMENT' && (
+            <div style={fieldStyle}>
+              <span style={lblStyle}>
+                <span aria-hidden="true" style={lblLineStyle} />
+                {t('tournamentTypeLabel')}
+              </span>
+              <div
+                role="radiogroup"
+                aria-label={t('tournamentTypeLabel')}
+                style={{ ...segStyle, gridTemplateColumns: 'repeat(2, 1fr)' }}
+              >
+                {(['A', 'B'] as const).map((m) => {
+                  const on = draft.tournamentMode === m;
+                  return (
+                    <button
+                      key={m}
+                      type="button"
+                      role="radio"
+                      aria-checked={on}
+                      onClick={() => set('tournamentMode', m)}
+                      className="pc-seg-btn"
+                      style={{
+                        ...segBtnStyle,
+                        background: on ? 'var(--pc-accent)' : 'transparent',
+                        color: on ? '#fff' : 'var(--pc-text2)',
+                        boxShadow: on ? 'inset 0 -2px 0 #5a35cc' : 'none',
+                      }}
+                    >
+                      {m === 'A' ? t('tModeA') : t('tModeB')}
+                    </button>
+                  );
+                })}
+              </div>
+              <span style={rowDescStyle}>
+                {draft.tournamentMode === 'A' ? t('tModeAHint') : t('tModeBHint')}
+              </span>
+            </div>
+          )}
 
           {/* categoryMode segmented */}
           <div style={fieldStyle}>

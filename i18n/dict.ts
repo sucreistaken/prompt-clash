@@ -525,6 +525,13 @@ export const dictionaries = {
     tBracketFinalists: 'Finalistler',
     tBracketEliminated: 'Elendi',
     tCtrlRosterLabel: 'Oyuncu listesi',
+
+    // ─── Tournament Mode B selector (Task B1) ───
+    tournamentTypeLabel: 'Turnuva tipi',
+    tModeA: 'Aynı Sahne',
+    tModeAHint: 'Herkes aynı konu, global sıralama',
+    tModeB: 'Eleme Grupları',
+    tModeBHint: 'Gruplar sırayla yarışır + wildcard',
   },
   en: {
     // ─── existing ───
@@ -1051,6 +1058,13 @@ export const dictionaries = {
     tBracketFinalists: 'Finalists',
     tBracketEliminated: 'Eliminated',
     tCtrlRosterLabel: 'Roster',
+
+    // ─── Tournament Mode B selector (Task B1) ───
+    tournamentTypeLabel: 'Tournament type',
+    tModeA: 'Same Stage',
+    tModeAHint: 'Everyone same topic, global ranking',
+    tModeB: 'Group Elimination',
+    tModeBHint: 'Groups compete in turns + wildcard',
   },
 } as const;
 

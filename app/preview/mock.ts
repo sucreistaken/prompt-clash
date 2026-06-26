@@ -199,6 +199,7 @@ export function mockTournamentCtx(
       ? [{ entrantId: 'e1', nickname: 'ayşe_x' }, { entrantId: 'e2', nickname: 'mert' }]
       : null,
     roster,
+    mode: 'A',
   };
 
   state.tournament = tournament;
