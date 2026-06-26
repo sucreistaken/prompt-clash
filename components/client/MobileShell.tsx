@@ -11,6 +11,7 @@ import { ResultView } from './ResultView';
 import { LangToggle } from './LangToggle';
 import { PlayerWaitingView } from './PlayerWaitingView';
 import { ReadyCheckView } from './ReadyCheckView';
+import { TournamentMobileShell } from './TournamentMobileShell';
 
 export function MobileShell() {
   return (
@@ -54,6 +55,10 @@ function MobileShellInner() {
       </>
     );
   }
+
+  // Tournament mode — hand off entirely to the tournament shell.
+  // Do NOT alter the duel routing below.
+  if (state.roomMode === 'TOURNAMENT') return <TournamentMobileShell />;
 
   // Active player flow
   if (mySlot) {
@@ -121,4 +126,3 @@ function AudienceShell({ phase }: { phase: string }) {
       return <AudienceView />;
   }
 }
-

@@ -2,7 +2,7 @@
 // auto-player (/demo). One source of truth so the two never drift. No socket,
 // no AI, no DB — pure fixtures that exercise every StageShell phase board.
 
-import type { Phase, Slot, StateSnapshot } from '@/types/game';
+import type { Phase, Slot, StateSnapshot, TournamentSnapshot, TournamentEntrantSnapshot } from '@/types/game';
 
 export const IMG_A = 'https://picsum.photos/seed/clash-a/700/700';
 export const IMG_B = 'https://picsum.photos/seed/clash-b/700/700';
@@ -134,6 +134,82 @@ export function mockGameCtx(
     sendTyping: () => {},
     vote: async () => ({ ok: false }),
     forceUpdate: () => {},
+    tournament: null,
+    myEntrant: null,
+    submitTournamentPrompt: () => {},
+    startTournament: async () => ({ ok: false }),
+  };
+}
+
+/**
+ * Mock tournament context for /preview/phone?mode=tournament.
+ * Provides a believable TournamentSnapshot at the given phase.
+ * `opts.eliminated` simulates the local player being knocked out.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function mockTournamentCtx(
+  tphase: string,
+  opts: { eliminated?: boolean; theme?: 'dark' | 'light' } = {},
+): any {
+  const theme = opts.theme ?? 'dark';
+  const eliminated = opts.eliminated ?? false;
+
+  // Use a duel phase for countdown plumbing (phaseEndsAt lives on state).
+  const basePhase: Phase = tphase === 'ROUND_PROMPTING' ? 'PROMPTING' : 'IDLE';
+  const { state } = buildMock(basePhase);
+  state.stageTheme = theme;
+  state.roomMode = 'TOURNAMENT';
+  state.phaseEndsAt = tphase === 'ROUND_PROMPTING' ? Date.now() + 22_000 : null;
+
+  const roster: TournamentEntrantSnapshot[] = [
+    { entrantId: 'e1', nickname: 'ayşe_x',  eliminated: false, lastScore: 90 },
+    { entrantId: 'e2', nickname: 'mert',     eliminated: false, lastScore: 84 },
+    { entrantId: 'e3', nickname: 'zeynep',   eliminated: false, lastScore: 86 },
+    { entrantId: 'e4', nickname: 'elif',     eliminated: false, lastScore: 82 },
+    { entrantId: 'e5', nickname: 'cem',      eliminated: true,  lastScore: 78 },
+    { entrantId: 'e6', nickname: 'nur',      eliminated: true,  lastScore: 70 },
+    { entrantId: 'e7', nickname: 'kaan',     eliminated: true,  lastScore: 72 },
+    { entrantId: 'me', nickname: 'sen',      eliminated,        lastScore: eliminated ? 74 : 88 },
+  ];
+
+  const isComplete = tphase === 'COMPLETE';
+  const isFinal = tphase === 'FINAL_DUEL' || isComplete;
+
+  const tournament: TournamentSnapshot = {
+    phase: tphase,
+    roundIndex: 1,
+    roundCount: 3,
+    activeCount: 4,
+    totalCount: 8,
+    topic: tphase === 'ROUND_PROMPTING' ? { promptTr: 'DANS EDEN TOST MAKİNESİ' } : null,
+    champion: isComplete ? { entrantId: 'e1', nickname: 'ayşe_x' } : null,
+    finalists: isFinal
+      ? [{ entrantId: 'e1', nickname: 'ayşe_x' }, { entrantId: 'e2', nickname: 'mert' }]
+      : null,
+    roster,
+  };
+
+  state.tournament = tournament;
+
+  const myEntrant: TournamentEntrantSnapshot | null =
+    roster.find((e) => e.entrantId === 'me') ?? null;
+
+  return {
+    socket: null,
+    state,
+    livePrompts: { A: '', B: '' },
+    mySlot: null,
+    myNickname: 'sen',
+    setMyNickname: () => {},
+    joinGame: async () => ({ ok: false }),
+    submitPrompt: () => {},
+    sendTyping: () => {},
+    vote: async () => ({ ok: false }),
+    forceUpdate: () => {},
+    tournament,
+    myEntrant,
+    submitTournamentPrompt: () => {},
+    startTournament: async () => ({ ok: true }),
   };
 }
 

@@ -468,6 +468,26 @@ export const dictionaries = {
       'Kod yanlış olabilir, ya da maç bitmiş olabilir. Bir kontrol et, ya da yeni bir oda aç.',
     notFoundHome: 'Ana sayfaya dön',
     notFoundCreate: 'Yeni oda oluştur',
+
+    // ─── Tournament phone shell (Task 8a) ───
+    tJoinTitle: 'QR OKUT & KATIL',
+    tJoinLobbyLabel: 'TURNUVA LOBİSİ',
+    tJoinedConfirm: 'Katıldın ✓',
+    tJoinCount: '{n} oyuncu katıldı',
+    tJoinActive: 'aktif oyuncu',
+    tJoinWaiting: 'Turnuva başlamayı bekliyor…',
+    tPromptRoundLabel: 'TUR {n}',
+    tPromptTopicLabel: 'KONU',
+    tPromptSend: 'GÖNDER →',
+    tPromptSubmitted: 'Gönderildi ✓',
+    tPromptPlaceholder: 'Konuyu AI\'ya tarif et…',
+    tWaitConnecting: 'Bağlanıyor…',
+    tWaitScoring: 'AI puanlıyor, biraz bekle.',
+    tWaitEliminated: 'Elendin. Harika bir oyundu!',
+    tWaitFinal: 'Finaller başlıyor!',
+    tWaitWatching: 'Şu an izliyorsun.',
+    tWaitComplete: 'Turnuva bitti!',
+    tChampionIs: 'Şampiyon',
   },
   en: {
     // ─── existing ───
@@ -937,6 +957,26 @@ export const dictionaries = {
       'The code may be wrong or the match may have ended. Double-check, or spin up a new room.',
     notFoundHome: 'Back to home',
     notFoundCreate: 'Create a new room',
+
+    // ─── Tournament phone shell (Task 8a) ───
+    tJoinTitle: 'SCAN QR & JOIN',
+    tJoinLobbyLabel: 'TOURNAMENT LOBBY',
+    tJoinedConfirm: "You're in ✓",
+    tJoinCount: '{n} players joined',
+    tJoinActive: 'active players',
+    tJoinWaiting: 'Waiting for the tournament to start…',
+    tPromptRoundLabel: 'ROUND {n}',
+    tPromptTopicLabel: 'TOPIC',
+    tPromptSend: 'SUBMIT →',
+    tPromptSubmitted: 'Submitted ✓',
+    tPromptPlaceholder: 'Describe the topic to the AI…',
+    tWaitConnecting: 'Connecting…',
+    tWaitScoring: 'AI is scoring, hang on.',
+    tWaitEliminated: 'Eliminated. Great run!',
+    tWaitFinal: 'Finals are starting!',
+    tWaitWatching: "You're watching now.",
+    tWaitComplete: 'Tournament complete!',
+    tChampionIs: 'Champion',
   },
 } as const;
 
