@@ -13,10 +13,12 @@ import { AppHeader } from '@/components/common/AppHeader';
 import { BackLink } from '@/components/common/BackLink';
 import { BgAtmosphere } from '@/components/common/BgAtmosphere';
 import { MascotFrame } from '@/components/common/MascotFrame';
+import type { RoomMode } from '@/types/game';
 
 type CategoryMode = 'RANDOM' | 'HOST_SELECTED' | 'PLAYER_VOTE';
 
 type RoomDraft = {
+  roomMode: RoomMode;
   categoryMode: CategoryMode;
   audienceEnabled: boolean;
   promptDuration: number;
@@ -29,6 +31,7 @@ type RoomDraft = {
 };
 
 const DEFAULTS: RoomDraft = {
+  roomMode: 'DUEL',
   categoryMode: 'RANDOM',
   audienceEnabled: true,
   promptDuration: 60,
@@ -125,6 +128,44 @@ function CreateRoomBody() {
         </section>
 
         <form onSubmit={submit} noValidate style={formStyle}>
+          {/* roomMode segmented — first control, frames everything else */}
+          <div style={fieldStyle}>
+            <span style={lblStyle}>
+              <span aria-hidden="true" style={lblLineStyle} />
+              {t('gameMode')}
+            </span>
+            <div
+              role="radiogroup"
+              aria-label={t('gameMode')}
+              style={{ ...segStyle, gridTemplateColumns: 'repeat(2, 1fr)' }}
+            >
+              {(['DUEL', 'TOURNAMENT'] as const).map((mode) => {
+                const on = draft.roomMode === mode;
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    onClick={() => set('roomMode', mode)}
+                    className="pc-seg-btn"
+                    style={{
+                      ...segBtnStyle,
+                      background: on ? 'var(--pc-accent)' : 'transparent',
+                      color: on ? '#fff' : 'var(--pc-text2)',
+                      boxShadow: on ? 'inset 0 -2px 0 #5a35cc' : 'none',
+                    }}
+                  >
+                    {mode === 'DUEL' ? t('modeDuel') : t('modeTournament')}
+                  </button>
+                );
+              })}
+            </div>
+            {draft.roomMode === 'TOURNAMENT' && (
+              <span style={rowDescStyle}>{t('modeTournamentHint')}</span>
+            )}
+          </div>
+
           {/* categoryMode segmented */}
           <div style={fieldStyle}>
             <span style={lblStyle}>
