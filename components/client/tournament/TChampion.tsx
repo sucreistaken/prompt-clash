@@ -53,16 +53,20 @@ export function TChampion() {
             textAlign: 'center',
           }}
         >
-          {/* Crown icon */}
+          {/* Crown icon — pixel-art SVG (no emoji), matches the stage/mockup crown */}
           <div
             aria-hidden="true"
-            style={{
-              fontSize: 52,
-              lineHeight: 1,
-              filter: 'drop-shadow(0 4px 12px rgba(174,210,74,0.40))',
-            }}
+            style={{ filter: 'drop-shadow(0 4px 12px rgba(174,210,74,0.40))' }}
           >
-            👑
+            <svg width="56" height="38" viewBox="0 0 24 16" shapeRendering="crispEdges">
+              <g fill="#ffd24a">
+                <rect x="2" y="10" width="20" height="4" />
+                <rect x="2" y="4" width="4" height="8" />
+                <rect x="10" y="2" width="4" height="10" />
+                <rect x="18" y="4" width="4" height="8" />
+                <rect x="9" y="0" width="6" height="2" />
+              </g>
+            </svg>
           </div>
 
           <MascotFrame

@@ -15,7 +15,8 @@ import { useI18n } from '../i18nContext';
  * Countdown from phaseEndsAt.
  */
 
-const EMOJI_REACTIONS = ['🔥', '🤯', '👀', '💫', '🏆'];
+// Typographic reaction glyphs (no emoji), per the v3 mockup's ♥ ▲ ★ row.
+const REACTION_GLYPHS = ['♥', '▲', '★', '✕'];
 
 export function TFinalVote() {
   const { state, tournament, vote } = useGameState();
@@ -222,9 +223,9 @@ export function TFinalVote() {
               paddingTop: 8,
             }}
           >
-            {EMOJI_REACTIONS.map((emoji) => (
+            {REACTION_GLYPHS.map((glyph) => (
               <span
-                key={emoji}
+                key={glyph}
                 aria-hidden="true"
                 style={{
                   fontSize: 20,
@@ -232,7 +233,7 @@ export function TFinalVote() {
                   userSelect: 'none',
                 }}
               >
-                {emoji}
+                {glyph}
               </span>
             ))}
           </div>
