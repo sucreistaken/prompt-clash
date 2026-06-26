@@ -32,6 +32,7 @@ import { BgAtmosphere } from '@/components/common/BgAtmosphere';
 import { RolePill } from '@/components/common/RolePill';
 import { MascotFrame } from '@/components/common/MascotFrame';
 import { QrModal } from '@/components/room/QrModal';
+import { TournamentBracket, type TournamentSnapshot } from '@/components/admin/TournamentBracket';
 
 type Props = {
   roomId: string;
@@ -65,11 +66,17 @@ function PanelBody({ roomId, roomCode, roomName, audienceEnabled, origin }: Prop
   // dinler — host olarak bağlanıyoruz ki kontrol paneli oyuncu giriş/çıkışını
   // anlık görsün ("Bekleniyor" → nickname).
   const deviceId = useDeviceId();
-  const { snapshot } = useRoomState({
+  const { snapshot, emit } = useRoomState({
     roomId,
     role: 'host',
     deviceId: deviceId ?? undefined,
   });
+
+  // Tournament mode derivations
+  const isTournament = snapshot?.roomMode === 'TOURNAMENT';
+  const tournament = snapshot?.tournament as TournamentSnapshot | undefined;
+  const canStartTournament =
+    !!tournament && tournament.phase === 'LOBBY' && tournament.activeCount >= 2;
 
   const players: [PlayerSlot, PlayerSlot] = useMemo(() => {
     const A = snapshot?.players?.A;
@@ -119,6 +126,11 @@ function PanelBody({ roomId, roomCode, roomName, audienceEnabled, origin }: Prop
   function startMatch() {
     if (!canStart) return;
     // Epic 2: emit socket event. Şimdilik no-op.
+  }
+
+  function startTournament() {
+    if (!canStartTournament) return;
+    emit('start_tournament', {});
   }
 
   async function closeRoom() {
@@ -269,61 +281,71 @@ function PanelBody({ roomId, roomCode, roomName, audienceEnabled, origin }: Prop
           </details>
         </section>
 
-        {/* LOBBY STATUS */}
-        <section style={lobbyStyle} className="pc-lobby">
-          <MascotFrame size={96} mascotSize={76} variant="default" />
-          <h2 style={lobbyTtlStyle}>{t('roomLobbyTtl')}</h2>
-          <p style={lobbyBodyStyle}>{t(lobbyBodyKey)}</p>
+        {isTournament ? (
+          <TournamentControlSection
+            tournament={tournament}
+            canStart={canStartTournament}
+            onStart={startTournament}
+          />
+        ) : (
+          <>
+            {/* LOBBY STATUS */}
+            <section style={lobbyStyle} className="pc-lobby">
+              <MascotFrame size={96} mascotSize={76} variant="default" />
+              <h2 style={lobbyTtlStyle}>{t('roomLobbyTtl')}</h2>
+              <p style={lobbyBodyStyle}>{t(lobbyBodyKey)}</p>
 
-          <div style={slotsRowStyle} aria-label={t('ariaSlots')}>
-            <Slot index={1} player={players[0]} />
-            <span style={vsStyle} aria-hidden="true">
-              VS
-            </span>
-            <Slot index={2} player={players[1]} />
-          </div>
+              <div style={slotsRowStyle} aria-label={t('ariaSlots')}>
+                <Slot index={1} player={players[0]} />
+                <span style={vsStyle} aria-hidden="true">
+                  VS
+                </span>
+                <Slot index={2} player={players[1]} />
+              </div>
 
-          <div style={audienceLineStyle}>
-            <span style={audienceDotStyle} aria-hidden="true" />
-            <span>
-              <b style={audienceCountValStyle}>{audienceCount}</b>{' '}
-              {t('roomAudienceCountSuffix')}
-            </span>
-          </div>
-        </section>
+              <div style={audienceLineStyle}>
+                <span style={audienceDotStyle} aria-hidden="true" />
+                <span>
+                  <b style={audienceCountValStyle}>{audienceCount}</b>{' '}
+                  {t('roomAudienceCountSuffix')}
+                </span>
+              </div>
+            </section>
 
-        {/* ANA CTA — Maçı başlat */}
-        <div style={ctaWrapStyle}>
-          <button
-            type="button"
-            onClick={startMatch}
-            disabled={!canStart}
-            aria-disabled={!canStart}
-            className={canStart ? 'pc-start pc-start--ready' : 'pc-start pc-start--off'}
-            style={canStart ? startCtaReadyStyle : startCtaOffStyle}
-          >
-            <PlayGlyph />
-            {t('roomCtrlStart')}
-          </button>
-          {!canStart ? (
-            <p style={startHintStyle}>{t('roomStartDisabledHint')}</p>
-          ) : null}
-        </div>
-
-        {/* LIVE CONTROLS — yalnız match başladıysa */}
-        {matchStarted ? (
-          <section style={liveControlsStyle}>
-            <div style={sectionLabStyle}>
-              <span aria-hidden="true" style={lblLineStyle} />
-              {t('roomLiveControlsTtl')}
+            {/* ANA CTA — Maçı başlat */}
+            <div style={ctaWrapStyle}>
+              <button
+                type="button"
+                onClick={startMatch}
+                disabled={!canStart}
+                aria-disabled={!canStart}
+                className={canStart ? 'pc-start pc-start--ready' : 'pc-start pc-start--off'}
+                style={canStart ? startCtaReadyStyle : startCtaOffStyle}
+              >
+                <PlayGlyph />
+                {t('roomCtrlStart')}
+              </button>
+              {!canStart ? (
+                <p style={startHintStyle}>{t('roomStartDisabledHint')}</p>
+              ) : null}
             </div>
-            <div style={liveControlsBarStyle}>
-              <CompactCtrl label={t('roomCtrlPause')} />
-              <CompactCtrl label={t('roomCtrlExtend')} hint={t('roomCtrlHintExtend')} />
-              <CompactCtrl label={t('roomCtrlRetryGen')} />
-            </div>
-          </section>
-        ) : null}
+
+            {/* LIVE CONTROLS — yalnız match başladıysa */}
+            {matchStarted ? (
+              <section style={liveControlsStyle}>
+                <div style={sectionLabStyle}>
+                  <span aria-hidden="true" style={lblLineStyle} />
+                  {t('roomLiveControlsTtl')}
+                </div>
+                <div style={liveControlsBarStyle}>
+                  <CompactCtrl label={t('roomCtrlPause')} />
+                  <CompactCtrl label={t('roomCtrlExtend')} hint={t('roomCtrlHintExtend')} />
+                  <CompactCtrl label={t('roomCtrlRetryGen')} />
+                </div>
+              </section>
+            ) : null}
+          </>
+        )}
 
         {/* FOOTER · close room low-vis */}
         <div style={footerActionsStyle}>
@@ -460,6 +482,106 @@ function CompactCtrl({ label, hint }: { label: string; hint?: string }) {
       <span>{label}</span>
       {hint ? <span style={compactCtrlHintStyle}>{hint}</span> : null}
     </button>
+  );
+}
+
+// ─── Tournament control section ──────────────────────────────────────────────
+
+function TournamentControlSection({
+  tournament,
+  canStart,
+  onStart,
+}: {
+  tournament: TournamentSnapshot | null | undefined;
+  canStart: boolean;
+  onStart: () => void;
+}) {
+  const { t } = useI18n();
+
+  if (!tournament) return null;
+
+  const isLobby = tournament.phase === 'LOBBY';
+
+  return (
+    <section style={tSectionStyle}>
+      {isLobby ? (
+        <>
+          {/* Section label */}
+          <div style={sectionLabStyle}>
+            <span aria-hidden="true" style={lblLineStyle} />
+            {t('tCtrlTournamentLobbyTtl')}
+          </div>
+
+          {/* Player count + compact roster */}
+          <div style={tLobbyCardStyle}>
+            <div style={tLobbyCountRowStyle}>
+              <span style={tLobbyCountValStyle}>{tournament.totalCount}</span>
+              <span style={tLobbyCountLabelStyle}>
+                {t('tCtrlLobbyPlayers').replace('{n}', '').trim()}
+              </span>
+            </div>
+            {tournament.roster && tournament.roster.length > 0 ? (
+              <div style={tLobbyRosterStyle}>
+                {tournament.roster.map((e) => (
+                  <span key={e.entrantId} style={tLobbyRosterPillStyle}>
+                    {e.nickname}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          {/* Start CTA */}
+          <div style={ctaWrapStyle}>
+            <button
+              type="button"
+              onClick={onStart}
+              disabled={!canStart}
+              aria-disabled={!canStart}
+              className={canStart ? 'pc-start pc-start--ready' : 'pc-start pc-start--off'}
+              style={canStart ? startCtaReadyStyle : startCtaOffStyle}
+            >
+              <PlayGlyph />
+              {t('tCtrlStartTournament')}
+            </button>
+            {!canStart ? (
+              <p style={startHintStyle}>{t('tCtrlTournamentStartDisabledHint')}</p>
+            ) : null}
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Section label */}
+          <div style={sectionLabStyle}>
+            <span aria-hidden="true" style={lblLineStyle} />
+            {t('tCtrlTournamentLive')}
+          </div>
+
+          {/* Round + remaining meta */}
+          <div style={tMetaRowStyle}>
+            <span style={tRoundBadgeStyle}>
+              {t('tCtrlRound')
+                .replace('{n}', String(tournament.roundIndex + 1))
+                .replace('{total}', String(tournament.roundCount))}
+            </span>
+            <span style={tRemainingStyle}>
+              {t('tCtrlRemaining').replace('{n}', String(tournament.activeCount))}
+            </span>
+          </div>
+
+          {/* Current topic */}
+          {tournament.topic?.promptTr ? (
+            <div style={tTopicStyle}>
+              <span style={tTopicLabelStyle}>{t('tCtrlTopicLabel')}</span>
+              <span style={tTopicTextStyle}>{tournament.topic.promptTr}</span>
+            </div>
+          ) : null}
+
+          {/* Bracket */}
+          <TournamentBracket tournament={tournament} />
+        </>
+      )}
+    </section>
   );
 }
 
@@ -1091,4 +1213,115 @@ const errBoxStyle: CSSProperties = {
   color: '#ffb0b0',
   fontSize: 12.5,
   fontFamily: "'Inter Tight', system-ui, sans-serif",
+};
+
+// Tournament control section
+const tSectionStyle: CSSProperties = {
+  marginTop: 22,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 14,
+};
+
+const tLobbyCardStyle: CSSProperties = {
+  background: 'var(--pc-ink2)',
+  border: '1.5px solid var(--pc-line)',
+  borderRadius: 14,
+  padding: '18px 18px 16px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 12,
+};
+
+const tLobbyCountRowStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'baseline',
+  gap: 8,
+};
+
+const tLobbyCountValStyle: CSSProperties = {
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 'clamp(28px, 8vw, 36px)',
+  fontWeight: 800,
+  color: 'var(--pc-bone)',
+  lineHeight: 1,
+};
+
+const tLobbyCountLabelStyle: CSSProperties = {
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 13,
+  fontWeight: 500,
+  color: 'var(--pc-text3)',
+};
+
+const tLobbyRosterStyle: CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 6,
+};
+
+const tLobbyRosterPillStyle: CSSProperties = {
+  padding: '4px 10px',
+  borderRadius: 6,
+  background: 'rgba(124,77,255,0.10)',
+  border: '1px solid rgba(124,77,255,0.22)',
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 12.5,
+  fontWeight: 600,
+  color: 'var(--pc-text)',
+};
+
+const tMetaRowStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 12,
+  padding: '12px 14px',
+  borderRadius: 10,
+  background: 'var(--pc-ink2)',
+  border: '1.5px solid var(--pc-line)',
+};
+
+const tRoundBadgeStyle: CSSProperties = {
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 13.5,
+  fontWeight: 800,
+  color: 'var(--pc-bone)',
+  letterSpacing: '0.02em',
+};
+
+const tRemainingStyle: CSSProperties = {
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: '0.10em',
+  textTransform: 'uppercase',
+  color: '#aed24a',
+};
+
+const tTopicStyle: CSSProperties = {
+  padding: '10px 14px',
+  borderRadius: 10,
+  background: 'var(--pc-ink2)',
+  border: '1px solid var(--pc-line2)',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 4,
+};
+
+const tTopicLabelStyle: CSSProperties = {
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 9.5,
+  fontWeight: 700,
+  letterSpacing: '0.22em',
+  textTransform: 'uppercase',
+  color: 'var(--pc-text3)',
+};
+
+const tTopicTextStyle: CSSProperties = {
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 14,
+  fontWeight: 500,
+  color: 'var(--pc-bone)',
+  lineHeight: 1.4,
 };

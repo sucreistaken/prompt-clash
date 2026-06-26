@@ -511,6 +511,20 @@ export const dictionaries = {
     tFinalVotePick: 'Kazanmasını istediğine oy ver',
     tChampionTitle: 'TURNUVA ŞAMPİYONU',
     tChampionCongrats: 'Tüm katılımcılar harika iş çıkardı. Bir dahaki yarışmada görüşmek üzere!',
+
+    // ─── Tournament host control panel (Task 10) ───
+    tCtrlStartTournament: 'Turnuvayı başlat',
+    tCtrlTournamentStartDisabledHint: 'Başlamak için en az 2 katılımcı gerekli',
+    tCtrlTournamentLobbyTtl: 'Turnuva lobisi',
+    tCtrlTournamentLive: 'Turnuva devam ediyor',
+    tCtrlLobbyPlayers: '{n} oyuncu katıldı',
+    tCtrlRound: 'Tur {n}/{total}',
+    tCtrlRemaining: '{n} kalan',
+    tCtrlTopicLabel: 'Konu',
+    tBracketChampion: 'Şampiyon',
+    tBracketFinalists: 'Finalistler',
+    tBracketEliminated: 'Elendi',
+    tCtrlRosterLabel: 'Oyuncu listesi',
   },
   en: {
     // ─── existing ───
@@ -1023,6 +1037,20 @@ export const dictionaries = {
     tFinalVotePick: 'Vote for who you want to win',
     tChampionTitle: 'TOURNAMENT CHAMPION',
     tChampionCongrats: 'Everyone played brilliantly. See you at the next tournament!',
+
+    // ─── Tournament host control panel (Task 10) ───
+    tCtrlStartTournament: 'Start tournament',
+    tCtrlTournamentStartDisabledHint: 'Need at least 2 entrants to start',
+    tCtrlTournamentLobbyTtl: 'Tournament lobby',
+    tCtrlTournamentLive: 'Tournament in progress',
+    tCtrlLobbyPlayers: '{n} players joined',
+    tCtrlRound: 'Round {n}/{total}',
+    tCtrlRemaining: '{n} remaining',
+    tCtrlTopicLabel: 'Topic',
+    tBracketChampion: 'Champion',
+    tBracketFinalists: 'Finalists',
+    tBracketEliminated: 'Eliminated',
+    tCtrlRosterLabel: 'Roster',
   },
 } as const;
 
