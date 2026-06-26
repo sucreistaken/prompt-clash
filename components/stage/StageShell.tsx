@@ -11,6 +11,9 @@ import { StageGenerating } from './StageGenerating';
 import { StageVoting } from './StageVoting';
 import { StageResult } from './StageResult';
 import { StageAudio } from './StageAudio';
+import { TStageCounter } from './tournament/TStageCounter';
+import { TStageChampion } from './tournament/TStageChampion';
+import { TStageLobby } from './tournament/TStageLobby';
 
 /**
  * Stage root - broadcast/arcade dark stage scaled into any projector viewport.
@@ -27,11 +30,39 @@ export function StageShell() {
       <StageFonts />
       <StageKeyframes />
       <StageScaler>
-        {state ? <PhaseBoard phase={state.phase} /> : <LoadingStage label={t('connecting')} />}
+        {state ? (
+          state.roomMode === 'TOURNAMENT'
+            ? <TournamentStage />
+            : <PhaseBoard phase={state.phase} />
+        ) : <LoadingStage label={t('connecting')} />}
       </StageScaler>
       <StageAudio phase={state?.phase} />
     </MotionConfig>
   );
+}
+
+/**
+ * Routes tournament phases to their dedicated stage boards.
+ * FINAL_DUEL reuses the duel PhaseBoard — it IS a real duel.
+ */
+function TournamentStage() {
+  const { state, tournament: t } = useGameState();
+  if (!t) return <LoadingStage label="..." />;
+  switch (t.phase) {
+    case 'LOBBY':
+      return <TStageLobby />;
+    case 'ROUND_PROMPTING':
+    case 'ROUND_GENERATING':
+    case 'ROUND_SCORING':
+    case 'ROUND_CUT':
+      return <TStageCounter />;
+    case 'FINAL_DUEL':
+      return <PhaseBoard phase={state!.phase} />;
+    case 'COMPLETE':
+      return <TStageChampion />;
+    default:
+      return <TStageCounter />;
+  }
 }
 
 function PhaseBoard({ phase }: { phase: string }) {

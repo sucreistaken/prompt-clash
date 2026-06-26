@@ -162,16 +162,26 @@ export function mockTournamentCtx(
   state.phaseEndsAt = tphase === 'ROUND_PROMPTING' ? Date.now() + 22_000 : null;
 
   const roster: TournamentEntrantSnapshot[] = [
-    { entrantId: 'e1', nickname: 'ayşe_x',  eliminated: false, lastScore: 90 },
-    { entrantId: 'e2', nickname: 'mert',     eliminated: false, lastScore: 84 },
-    { entrantId: 'e3', nickname: 'zeynep',   eliminated: false, lastScore: 86 },
-    { entrantId: 'e4', nickname: 'elif',     eliminated: false, lastScore: 82 },
-    { entrantId: 'e5', nickname: 'cem',      eliminated: true,  lastScore: 78 },
-    { entrantId: 'e6', nickname: 'nur',      eliminated: true,  lastScore: 70 },
-    { entrantId: 'e7', nickname: 'kaan',     eliminated: true,  lastScore: 72 },
-    { entrantId: 'me', nickname: 'sen',      eliminated,        lastScore: eliminated ? 74 : 88 },
+    { entrantId: 'e1',  nickname: 'ayşe_x',  eliminated: false, lastScore: 90 },
+    { entrantId: 'e2',  nickname: 'mert',     eliminated: false, lastScore: 84 },
+    { entrantId: 'e3',  nickname: 'zeynep',   eliminated: false, lastScore: 86 },
+    { entrantId: 'e4',  nickname: 'elif',     eliminated: false, lastScore: 82 },
+    { entrantId: 'e5',  nickname: 'cem',      eliminated: true,  lastScore: 78 },
+    { entrantId: 'e6',  nickname: 'nur',      eliminated: true,  lastScore: 70 },
+    { entrantId: 'e7',  nickname: 'kaan',     eliminated: true,  lastScore: 72 },
+    { entrantId: 'me',  nickname: 'sen',      eliminated,        lastScore: eliminated ? 74 : 88 },
+    // Extended roster for a visually fuller wall on stage
+    { entrantId: 'e9',  nickname: 'burak',    eliminated: true,  lastScore: 65 },
+    { entrantId: 'e10', nickname: 'defne',    eliminated: false, lastScore: 81 },
+    { entrantId: 'e11', nickname: 'tarık',    eliminated: true,  lastScore: 68 },
+    { entrantId: 'e12', nickname: 'selin',    eliminated: false, lastScore: 79 },
+    { entrantId: 'e13', nickname: 'yusuf',    eliminated: true,  lastScore: 62 },
+    { entrantId: 'e14', nickname: 'hande',    eliminated: false, lastScore: 77 },
+    { entrantId: 'e15', nickname: 'berk',     eliminated: true,  lastScore: 60 },
+    { entrantId: 'e16', nickname: 'melis',    eliminated: true,  lastScore: 66 },
   ];
 
+  const activeCount = roster.filter((e) => !e.eliminated).length;
   const isComplete = tphase === 'COMPLETE';
   const isFinal = tphase === 'FINAL_DUEL' || isComplete;
 
@@ -179,9 +189,11 @@ export function mockTournamentCtx(
     phase: tphase,
     roundIndex: 1,
     roundCount: 3,
-    activeCount: 4,
-    totalCount: 8,
-    topic: tphase === 'ROUND_PROMPTING' ? { promptTr: 'DANS EDEN TOST MAKİNESİ' } : null,
+    activeCount,
+    totalCount: roster.length,
+    topic: ['ROUND_PROMPTING', 'ROUND_SCORING', 'ROUND_GENERATING', 'ROUND_CUT'].includes(tphase)
+      ? { promptTr: 'DANS EDEN TOST MAKİNESİ' }
+      : null,
     champion: isComplete ? { entrantId: 'e1', nickname: 'ayşe_x' } : null,
     finalists: isFinal
       ? [{ entrantId: 'e1', nickname: 'ayşe_x' }, { entrantId: 'e2', nickname: 'mert' }]

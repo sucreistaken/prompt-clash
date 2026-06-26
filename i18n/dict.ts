@@ -469,6 +469,12 @@ export const dictionaries = {
     notFoundHome: 'Ana sayfaya dön',
     notFoundCreate: 'Yeni oda oluştur',
 
+    // ─── Tournament stage boards (Task 9) ───
+    tStageRemaining: 'KALAN',
+    tStageTournament: 'TURNUVA',
+    tStageJoinQr: 'QR ile katıl, turnuvaya gir',
+    tStageChampionLabel: 'ŞAMPİYON',
+
     // ─── Tournament phone shell (Task 8a) ───
     tJoinTitle: 'QR OKUT & KATIL',
     tJoinLobbyLabel: 'TURNUVA LOBİSİ',
@@ -974,6 +980,12 @@ export const dictionaries = {
       'The code may be wrong or the match may have ended. Double-check, or spin up a new room.',
     notFoundHome: 'Back to home',
     notFoundCreate: 'Create a new room',
+
+    // ─── Tournament stage boards (Task 9) ───
+    tStageRemaining: 'REMAINING',
+    tStageTournament: 'TOURNAMENT',
+    tStageJoinQr: 'Scan QR to join the tournament',
+    tStageChampionLabel: 'CHAMPION',
 
     // ─── Tournament phone shell (Task 8a) ───
     tJoinTitle: 'SCAN QR & JOIN',

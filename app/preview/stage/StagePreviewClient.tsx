@@ -15,7 +15,7 @@ import { useSearchParams } from 'next/navigation';
 import { GameCtx } from '@/components/client/useGameState';
 import { I18nProvider } from '@/components/client/i18nContext';
 import { StageShell } from '@/components/stage/StageShell';
-import { mockGameCtx } from '../mock';
+import { mockGameCtx, mockTournamentCtx } from '../mock';
 import type { Phase } from '@/types/game';
 
 export default function StagePreviewClient() {
@@ -28,9 +28,20 @@ export default function StagePreviewClient() {
 
 function PreviewInner() {
   const params = useSearchParams();
-  const phase = (params.get('phase') as Phase) || 'IDLE';
   const theme = params.get('theme') === 'light' ? 'light' : 'dark';
 
+  if (params.get('mode') === 'tournament') {
+    const tphase = params.get('tphase') || 'ROUND_PROMPTING';
+    return (
+      <I18nProvider forceLang="tr">
+        <GameCtx.Provider value={mockTournamentCtx(tphase, { theme })}>
+          <StageShell />
+        </GameCtx.Provider>
+      </I18nProvider>
+    );
+  }
+
+  const phase = (params.get('phase') as Phase) || 'IDLE';
   return (
     <I18nProvider forceLang="tr">
       <GameCtx.Provider value={mockGameCtx(phase, null, theme)}>
