@@ -47,7 +47,9 @@ const CreateRoomBody = z.object({
   rematchEnabled: z.boolean().default(true),
   audienceVotingEnabled: z.boolean().default(false),
   roomMode: z.enum(['DUEL', 'TOURNAMENT']).default('DUEL'),
-  tournamentMode: z.enum(['A', 'B']).default('A')
+  tournamentMode: z.enum(['A', 'B']).default('A'),
+  categoryPool: z.array(z.string()).max(40).default([]),
+  customThemes: z.array(z.string().trim().min(2).max(60)).max(8).default([])
 });
 
 function _clientIp(req: Request): string {
