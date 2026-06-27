@@ -147,9 +147,9 @@ export function LandingClient() {
         .pc-code-field { transition: border-color .16s, box-shadow .16s; }
         .pc-code-field:focus-within { border-color: var(--pc-accent); box-shadow: 0 0 0 3px rgba(124,77,255,.18); }
         .pc-code-field--err { border-color: var(--pc-live); }
-        .pc-code-field button[type="submit"]:hover { color: var(--pc-bone); background: rgba(124,77,255,.10); }
-        .pc-code-field button[type="submit"]:active { transform: translateY(1px); color: var(--pc-bone); }
-        .pc-code-field button[type="submit"][data-busy="true"] { opacity: .65; cursor: wait; }
+        .pc-code-field button[type=submit]:hover { color: var(--pc-bone); background: rgba(124,77,255,.10); }
+        .pc-code-field button[type=submit]:active { transform: translateY(1px); color: var(--pc-bone); }
+        .pc-code-field button[type=submit][data-busy=true] { opacity: .65; cursor: wait; }
         .pc-cta-primary { transition: transform .1s, box-shadow .16s; }
         .pc-cta-primary:hover { box-shadow: 0 16px 40px rgba(124,77,255,.44), inset 0 -2px 0 rgba(0,0,0,.18); }
         .pc-cta-primary:active { transform: translateY(1px); }
