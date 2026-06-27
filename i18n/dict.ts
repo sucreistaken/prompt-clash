@@ -218,6 +218,9 @@ export const dictionaries = {
     createRoomTag: 'YENİ ODA',
     createRoomH1: 'Bir oda aç.',
     createRoomLead: 'Linkleri paylaş, oyuncular katılınca AI yarışı başlar.',
+    createRoomTagT: 'YENİ TURNUVA',
+    createRoomH1T: 'Turnuva aç.',
+    createRoomLeadT: 'QR ile katılan herkes yarışır — 100 kişiye kadar, robot hakem eler.',
     createRoomMascotLabel: 'AI HAKEM HAZIR',
     gameMode: 'Oyun modu',
     modeDuel: 'Düello',
@@ -543,6 +546,13 @@ export const dictionaries = {
     // ─── Tournament Mode B group labels (Task B5) ───
     tStageGroupLabel: 'GRUP',
     tBracketGroup: 'Grup',
+
+    // ─── TFinalVote phase-aware states ───
+    tFinalPrepTitle: 'FİNAL · Hazırlık',
+    tFinalPrepBody: 'Son 2 yarışmacı görsellerini oluşturuyor',
+    tFinalJudgingTitle: 'ROBOT KARAR VERİYOR',
+    tFinalResultTitle: 'KAZANAN',
+    tFinalImgPending: 'görsel oluşturuluyor…',
   },
   en: {
     // ─── existing ───
@@ -763,6 +773,9 @@ export const dictionaries = {
     createRoomTag: 'NEW ROOM',
     createRoomH1: 'Open a room.',
     createRoomLead: 'Share the links and the AI clash starts when players join.',
+    createRoomTagT: 'NEW TOURNAMENT',
+    createRoomH1T: 'Start a tournament.',
+    createRoomLeadT: 'Everyone who joins by QR competes — up to 100 players, the AI judge eliminates.',
     createRoomMascotLabel: 'AI REFEREE READY',
     gameMode: 'Game mode',
     modeDuel: 'Duel',
@@ -1087,6 +1100,13 @@ export const dictionaries = {
     // ─── Tournament Mode B group labels (Task B5) ───
     tStageGroupLabel: 'GROUP',
     tBracketGroup: 'Group',
+
+    // ─── TFinalVote phase-aware states ───
+    tFinalPrepTitle: 'FINAL · Getting ready',
+    tFinalPrepBody: 'The last 2 are creating their images',
+    tFinalJudgingTitle: 'THE JUDGE IS DECIDING',
+    tFinalResultTitle: 'WINNER',
+    tFinalImgPending: 'image generating…',
   },
 } as const;
 

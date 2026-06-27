@@ -114,10 +114,10 @@ function CreateRoomBody() {
         <section style={headStyle}>
           <span style={tagStyle}>
             <span aria-hidden="true" style={tagDotStyle} />
-            {t('createRoomTag')}
+            {t(draft.roomMode === 'TOURNAMENT' ? 'createRoomTagT' : 'createRoomTag')}
           </span>
-          <h1 style={h1Style}>{t('createRoomH1')}</h1>
-          <p style={subStyle}>{t('createRoomLead')}</p>
+          <h1 style={h1Style}>{t(draft.roomMode === 'TOURNAMENT' ? 'createRoomH1T' : 'createRoomH1')}</h1>
+          <p style={subStyle}>{t(draft.roomMode === 'TOURNAMENT' ? 'createRoomLeadT' : 'createRoomLead')}</p>
         </section>
 
         <section style={mascotHostStyle} aria-label={t('ariaMascot')}>
