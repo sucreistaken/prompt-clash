@@ -86,9 +86,9 @@ function NotFoundBody({ code, title, description }: Props) {
       </footer>
 
       <style>{`
-        .pc-cta { transition: transform .1s, box-shadow .16s; text-decoration: none; }
-        .pc-cta:hover { box-shadow: 0 14px 34px rgba(124,77,255,.42), inset 0 -2px 0 rgba(0,0,0,.18); }
-        .pc-cta:active { transform: translateY(1px); }
+        .pc-cta { transition: transform .08s ease-out, box-shadow .08s ease-out, filter .12s; text-decoration: none; }
+        .pc-cta:hover { filter: brightness(1.07); }
+        .pc-cta:active { transform: translateY(5px); box-shadow: 0 0 0 #4a2bb0, inset 0 2px 7px rgba(0,0,0,.32); }
         .pc-cta-sec { transition: border-color .14s, color .14s, background .14s; text-decoration: none; }
         .pc-cta-sec:hover { border-color: var(--pc-line2); color: var(--pc-bone); background: var(--pc-ink2); }
       `}</style>
@@ -121,12 +121,13 @@ const errCodePillStyle: CSSProperties = {
   alignItems: 'center',
   gap: 9,
   padding: '4px 11px',
-  borderRadius: 999,
+  borderRadius: 3,
   background: 'rgba(255,92,92,0.10)',
   border: '1px solid rgba(255,92,92,0.34)',
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 10.5,
-  letterSpacing: '0.10em',
+  fontWeight: 700,
+  letterSpacing: '0.16em',
   color: 'var(--pc-live)',
   textTransform: 'uppercase',
 };
@@ -167,26 +168,30 @@ const actionsStyle: CSSProperties = {
   marginTop: 4,
 };
 
+// Blok arcade tuşu — hard-offset taban.
 const ctaStyle: CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   gap: 10,
   minHeight: 56,
-  borderRadius: 10,
+  borderRadius: 4,
   background: 'var(--pc-accent)',
   color: '#fff',
-  border: 'none',
+  border: '2px solid #5a35cc',
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 15,
   fontWeight: 800,
+  letterSpacing: '0.02em',
+  textTransform: 'uppercase',
   cursor: 'pointer',
-  boxShadow: '0 10px 26px rgba(124,77,255,0.30), inset 0 -2px 0 rgba(0,0,0,0.18)',
+  boxShadow: '0 5px 0 #4a2bb0',
 };
 
 const ctaArrowStyle: CSSProperties = {
-  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
   fontSize: 17,
+  fontWeight: 800,
   lineHeight: 1,
 };
 
@@ -196,14 +201,15 @@ const ctaSecondaryStyle: CSSProperties = {
   justifyContent: 'center',
   gap: 8,
   minHeight: 46,
-  borderRadius: 10,
-  background: 'transparent',
-  border: '1.5px solid var(--pc-line)',
+  borderRadius: 4,
+  background: 'var(--pc-ink3)',
+  border: '1px solid var(--pc-line)',
   color: 'var(--pc-text)',
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 14,
-  fontWeight: 600,
+  fontWeight: 700,
   cursor: 'pointer',
+  boxShadow: '0 2px 0 var(--pc-ink)',
 };
 
 const footStyle: CSSProperties = {
