@@ -163,9 +163,9 @@ function JoinBody({ roomId, roomCode, roomName, initialFull = false }: Props) {
       <style>{`
         .pc-input { transition: border-color .16s, box-shadow .16s; }
         .pc-input:focus { border-color: var(--pc-accent) !important; box-shadow: 0 0 0 3px rgba(124,77,255,.18); outline: none; }
-        .pc-cta { transition: transform .1s, box-shadow .16s; }
-        .pc-cta:hover:not(:disabled) { box-shadow: 0 14px 36px rgba(124,77,255,.44), inset 0 -2px 0 rgba(0,0,0,.18); }
-        .pc-cta:active:not(:disabled) { transform: translateY(1px); }
+        .pc-cta { transition: transform .08s ease-out, box-shadow .08s ease-out, filter .12s; }
+        .pc-cta:hover:not(:disabled) { filter: brightness(1.07); }
+        .pc-cta:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 0 0 #4a2bb0, inset 0 2px 7px rgba(0,0,0,.32); }
       `}</style>
     </div>
   );
@@ -219,9 +219,9 @@ function JoinFullView({ roomCode }: { roomCode: string }) {
       </div>
 
       <style>{`
-        .pc-cta { transition: transform .1s, box-shadow .16s; text-decoration: none; }
-        .pc-cta:hover { box-shadow: 0 14px 36px rgba(124,77,255,.44), inset 0 -2px 0 rgba(0,0,0,.18); }
-        .pc-cta:active { transform: translateY(1px); }
+        .pc-cta { transition: transform .08s ease-out, box-shadow .08s ease-out, filter .12s; text-decoration: none; }
+        .pc-cta:hover { filter: brightness(1.07); }
+        .pc-cta:active { transform: translateY(5px); box-shadow: 0 0 0 #4a2bb0, inset 0 2px 7px rgba(0,0,0,.32); }
         .pc-cta-sec { transition: border-color .14s, color .14s, background .14s; text-decoration: none; }
         .pc-cta-sec:hover { border-color: var(--pc-line2); color: var(--pc-bone); background: var(--pc-ink2); }
       `}</style>
@@ -239,8 +239,8 @@ function SlotTile({ slot, label }: { slot: 'A' | 'B'; label: string }) {
         gap: 10,
         padding: 12,
         background: 'var(--pc-ink2)',
-        border: `1.5px solid ${isA ? 'var(--pc-accent)' : '#aed24a'}`,
-        borderRadius: 10,
+        border: `2px solid ${isA ? 'var(--pc-accent)' : '#aed24a'}`,
+        borderRadius: 4,
         minWidth: 0,
         boxShadow: isA
           ? 'inset 0 -2px 0 rgba(124,77,255,0.28)'
@@ -317,10 +317,12 @@ const tagBaseStyle: CSSProperties = {
   alignSelf: 'flex-start',
   gap: 8,
   padding: '4px 10px',
-  borderRadius: 999,
+  borderRadius: 3,
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 10.5,
-  letterSpacing: '0.10em',
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
 };
 
 const tagAccentStyle: CSSProperties = {
@@ -352,13 +354,15 @@ const tagNeutralDotStyle: CSSProperties = {
   flex: 'none',
 };
 
+// Pixel başlık — landing/create-room/control ile aynı Silkscreen dili.
 const h1Style: CSSProperties = {
-  fontFamily: "'Inter Tight', system-ui, sans-serif",
-  fontSize: 'clamp(24px, 6.5vw, 30px)',
-  fontWeight: 700,
+  fontFamily: "'Silkscreen', monospace",
+  fontSize: 'clamp(22px, 6vw, 30px)',
+  fontWeight: 400,
   color: 'var(--pc-bone)',
-  letterSpacing: '-0.005em',
-  lineHeight: 1.18,
+  letterSpacing: '0.02em',
+  lineHeight: 1.15,
+  textTransform: 'uppercase',
   margin: 0,
 };
 
@@ -405,11 +409,12 @@ const lblLineStyle: CSSProperties = {
   flex: 'none',
 };
 
+// Blok arcade input — sert kenar, dolu zemin.
 const inputStyle: CSSProperties = {
   height: 54,
-  borderRadius: 10,
-  background: 'var(--pc-ink2)',
-  border: '1.5px solid var(--pc-line)',
+  borderRadius: 4,
+  background: 'var(--pc-ink)',
+  border: '2px solid var(--pc-line2)',
   padding: '0 16px',
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 16,
@@ -426,22 +431,24 @@ const errBoxStyle: CSSProperties = {
   fontFamily: "'Inter Tight', system-ui, sans-serif",
 };
 
+// Blok arcade tuşu — hard-offset taban (soft glow yerine).
 const ctaStyle: CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   gap: 10,
   minHeight: 60,
-  borderRadius: 10,
+  borderRadius: 4,
   background: 'var(--pc-accent)',
   color: '#fff',
-  border: 'none',
+  border: '2px solid #5a35cc',
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 16,
   fontWeight: 800,
-  letterSpacing: '0.005em',
+  letterSpacing: '0.02em',
+  textTransform: 'uppercase',
   cursor: 'pointer',
-  boxShadow: '0 10px 28px rgba(124,77,255,0.32), inset 0 -2px 0 rgba(0,0,0,0.18)',
+  boxShadow: '0 5px 0 #4a2bb0',
   textDecoration: 'none',
 };
 
@@ -451,20 +458,22 @@ const ctaSecondaryStyle: CSSProperties = {
   justifyContent: 'center',
   gap: 8,
   minHeight: 46,
-  borderRadius: 10,
-  background: 'transparent',
-  border: '1.5px solid var(--pc-line)',
+  borderRadius: 4,
+  background: 'var(--pc-ink3)',
+  border: '1px solid var(--pc-line)',
   color: 'var(--pc-text)',
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 14,
-  fontWeight: 600,
+  fontWeight: 700,
   cursor: 'pointer',
   textDecoration: 'none',
+  boxShadow: '0 2px 0 var(--pc-ink)',
 };
 
 const ctaArrowStyle: CSSProperties = {
-  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
   fontSize: 18,
+  fontWeight: 800,
   lineHeight: 1,
 };
 
@@ -489,14 +498,14 @@ const vsMidStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontFamily: "'Silkscreen', monospace",
   fontSize: 13,
+  fontWeight: 400,
   letterSpacing: '0.04em',
-  color: 'var(--pc-text3)',
+  color: 'var(--pc-lime, #aed24a)',
   padding: '0 4px',
   minWidth: 28,
   flex: 'none',
-  textShadow: '0 0 10px rgba(124,77,255,0.3)',
 };
 
 const actionsStyle: CSSProperties = {
