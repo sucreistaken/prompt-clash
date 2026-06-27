@@ -20,10 +20,13 @@ npm run build      # next build
 npm start          # NODE_ENV=production node server.js
 npm run typecheck  # tsc --noEmit (no separate frontend/backend split)
 npm run lint       # next lint
+npm run i18n:check # asserts every tr: key in i18n/dict.ts has an en: twin
 
 # End-to-end smoke (server must be running):
-node scripts/matchSmoke.js              # simulates 2 players, asserts winner
-node scripts/demo-match.js              # keeps fake players connected for screenshots
+npm run smoke              # matchSmoke (2 players, asserts winner) + multiRoomSmoke (room isolation)
+npm run smoke:match        # just the single-match smoke
+npm run smoke:multi-room   # just the multi-room isolation smoke
+node scripts/demo-match.js # keeps fake players connected for screenshots
 ```
 
 Dev-time UI inspection without a live socket (uses `app/preview/mock.ts` fixtures, no AI calls):
@@ -38,15 +41,17 @@ Dev-time UI inspection without a live socket (uses `app/preview/mock.ts` fixture
 
 ## High-level architecture
 
-### One process, one match, no rooms
+### One process, multi-room, RAM-authoritative state
 
 - `server.js` hosts Next.js (App Router) AND Socket.io on the same port. Backend runtime is plain JS (`.js`) so it can `require()` without a transpile step; frontend is TS/TSX.
-- The match is a **global RAM singleton** in `lib/game/state.js`. There are no rooms; every socket event broadcasts to everyone and the **client filters by role** (player / audience / stage / admin). Role is given in socket auth at connect time. The state snapshot is already role-safe before broadcast.
-- This is intentional: the app is meant to deploy as **one Cloud Run instance** (`--min-instances=1 --max-instances=1 --session-affinity --cpu-throttling=disabled`). Don't introduce multi-instance state without rebuilding the assumption.
+- State is **multi-room**: a `Map<roomId, RoomState>` lives in `lib/game/roomRegistry.js` (backed on `globalThis` so `server.js`'s direct `require()` and Next's webpack-bundled `app/api/*` routes share one instance). Read room state via `getRoom(roomId)` — there is no global match singleton anymore.
+- Sockets join a socket.io room `room:<roomId>` (handshake middleware in `lib/socket/server.js` validates `auth.roomId`). A synthetic `'default'` room is bootstrapped at load so the legacy single-room UI + `matchSmoke.js` keep working. Fan-out is `io.to('room:'+roomId).emit('state', ...)`; the snapshot is **role-aware** (`buildSnapshot(roomId, role)` in `lib/socket/broadcasts.js`) and already role-safe before broadcast (player / audience / stage / admin).
+- Still **single-instance, RAM-authoritative** (no shared store): rooms live in process memory and are lost on restart/redeploy (accepted). Deploy is a **Dockerized container on a cloud VM** (SSH deploy via GitHub Actions) — **not** Cloud Run. Don't introduce a second instance without adding a shared store first.
+- The room model follows numbered **MUST rules** referenced throughout the code (MUST #1 broadcast-after-mutation, #2 `roomId` first arg, #5 `[scope:roomId-short]` log prefix, #7 audit log, etc.) and `D-*` decisions — preserve them when editing `lib/game/*` / `lib/socket/*`.
 
 ### Phase lifecycle is the source of truth
 
-`lib/game/state.js` exports a frozen `PHASES` enum and the singleton `state`. **All phase transitions go through `lib/game/matchLifecycle.js`** — every transition ends with `broadcastState()`. Phases:
+`lib/game/state.js` exports a frozen `PHASES` enum and per-room state factories. **All phase transitions go through `lib/game/matchLifecycle.js`** — every public function takes `roomId` as its first argument (MUST #2) and every transition ends with `broadcastState(roomId)` (MUST #1). Phases:
 
 ```
 IDLE → PLAYER_1_JOINED → VS_INTRO → PROMPTING → GENERATING → SCORING
@@ -55,7 +60,7 @@ IDLE → PLAYER_1_JOINED → VS_INTRO → PROMPTING → GENERATING → SCORING
 
 Per round, image generation runs **3+ times**: 1 target reference + 2 player outputs, plus a **prefetched next-round target** (`nextReferenceImageUrl`). This matters for provider quota planning.
 
-`bumpOperationEpoch()` / `isCurrentEpoch()` guards async results: when a match is reset or skipped mid-flight, in-flight `generateImage` / scoring promises check the epoch on resolve and drop themselves if stale. Always preserve this when adding new async work in lifecycle.
+`bumpOperationEpoch(roomId)` / `isCurrentEpoch(roomId, epoch)` guards async results **per room**: when a match is reset or skipped mid-flight, in-flight `generateImage` / scoring promises check the epoch on resolve and drop themselves if stale. **Pause is special** — an in-flight generation completes and the epoch is *not* bumped on pause/resume; the next queued job is blocked while `ROOM_PAUSED` (G-9). Always preserve this when adding new async work in lifecycle.
 
 ### Provider switchers (env-driven)
 
@@ -99,7 +104,7 @@ Removed in Epic 6 (Strategy B: old removed when last consumer migrates): `BrandF
 
 ### Sockets
 
-`lib/socket/server.js` has one namespace, no rooms. Events are rate-limited per `(ip, event)` + `(deviceId, event)` via `lib/rateLimit.js`. The admin role is identified by a signed cookie (`lib/adminAuth.js`) read off the handshake. Device identity persists via `pc_device_id` cookie (used to reattach players across reconnects).
+`lib/socket/server.js` has one namespace; the handshake middleware validates `auth.roomId` and **joins the socket to the socket.io room `room:<roomId>`** (D-5/D-6) — a missing `roomId` falls back to the synthetic `'default'` room. Events are rate-limited per `(ip, event)` + `(deviceId, event)` via `lib/rateLimit.js`. The admin role is identified by a signed cookie (`lib/adminAuth.js`) read off the handshake. Device identity persists via `pc_device_id` cookie (used to reattach players across reconnects, per room).
 
 ### MongoDB
 
@@ -115,7 +120,7 @@ Removed in Epic 6 (Strategy B: old removed when last consumer migrates): `BrandF
 - After backend (`lib/`, `server.js`, `models/`) changes, the dev server **must be restarted** — Next's HMR only watches the Next side.
 - After changing `.env`, restart the dev server (env is loaded at boot via `@next/env`).
 - When stopping a dev server in this codebase, prefer stopping the npm parent task — orphaned child `node` may hold port 3000; on Windows, kill by PID via PowerShell `Stop-Process -Id <pid> -Force`.
-- Use `npm run typecheck` to verify after edits — there is no separate test suite for the frontend; `scripts/matchSmoke.js` is the closest thing to an integration test and requires a running server.
+- Use `npm run typecheck` to verify after edits (this is also the CI deploy gate) — there is no unit-test framework; `npm run smoke` (matchSmoke + multiRoomSmoke) is the closest thing to an integration test and requires a running server.
 - The `mockups/` directory holds standalone HTML mockups used as design-spec artifacts. They are not built by Next; serve via `python -m http.server` from inside `mockups/` if you need to view them.
 - `public/uploads/` is the local STORAGE_PROVIDER target — generated images land here in dev; gitignored aside from the directory marker.
-- Cloud Run deploy is single-instance with session affinity and CPU throttling **disabled** (sockets need a hot CPU). See README for the exact `gcloud run deploy` flags.
+- Production runs as a **Dockerized container on a single cloud VM**, deployed over SSH by GitHub Actions (`.github/workflows/deploy.yml`: push to `main` → `npm run typecheck` gate → SSH → `deploy/deploy.sh` container swap, serialized by a `deploy-production` concurrency group). It is **not** serverless Cloud Run. State is single-instance / RAM-authoritative — keep it that way (sockets + in-RAM rooms assume one hot process). See `docs/DEPLOY-VM.md`, `Dockerfile`, `docker-compose.yml`, `deploy/`.

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="tr" data-pc-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prompt Clash · Turnuva v3 · Mobil + Desktop + Bracket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#22202b;--panel:#1b1a23;--card:#2a2833;--card2:#322f3d;
+    --line:#4a4757;--line2:#393745;
+    --text:#f7f4ec;--t2:rgba(247,244,236,.62);--t3:rgba(247,244,236,.40);
+    --a:#7c4dff;--b:#c5ff3a;--live:#ff5c5c;--gold:#ffd24a;
+    --pixel:'Silkscreen',monospace;--body:'Inter Tight',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(900px 500px at 12% -5%,rgba(124,77,255,.18),transparent 60%),var(--ink);color:var(--text);font-family:var(--body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1340px;margin:0 auto;padding:40px 24px 110px}
+  .brand{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .brand h1{font-family:var(--pixel);font-size:22px;margin:0;line-height:1.3}
+  .brand .tag{font-family:var(--mono);font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:2px}
+  .lede{color:var(--t2);font-size:15px;max-width:820px;margin:14px 0 22px;line-height:1.55}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:14px;font-family:var(--mono);font-size:12px;color:var(--t2)}
+  .legend b{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+  /* big band separators */
+  .band{font-family:var(--pixel);font-size:13px;letter-spacing:1px;color:var(--text);margin:46px 0 6px;padding:10px 16px;border-radius:10px;border:1px solid var(--line2);background:linear-gradient(90deg,rgba(124,77,255,.14),transparent);display:flex;align-items:center;gap:10px}
+  .band.mob{background:linear-gradient(90deg,rgba(197,255,58,.12),transparent)}
+  .surface{margin:0 0 30px}
+  .surface > h2{font-family:var(--pixel);font-size:14px;margin:22px 0 4px;display:flex;align-items:center;gap:10px}
+  .surface > p.sub{color:var(--t3);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 18px}
+  .row{display:flex;gap:18px;overflow-x:auto;padding:6px 2px 22px;scroll-snap-type:x proximity}
+  .row::-webkit-scrollbar{height:8px}.row::-webkit-scrollbar-thumb{background:var(--line2);border-radius:8px}
+  .step{flex:0 0 auto;scroll-snap-align:start;display:flex;flex-direction:column;gap:9px}
+  .cap{font-family:var(--mono);font-size:11px;color:var(--t2);max-width:300px}.cap b{color:var(--a)}
+  .arrow{flex:0 0 auto;align-self:center;color:var(--line);font-size:24px}
+  /* ── frames ── */
+  .phone{width:240px;height:496px;border-radius:30px;background:var(--panel);border:1px solid var(--line2);box-shadow:0 18px 40px -20px #000,inset 0 0 0 6px #15141c;padding:16px 14px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+  .phone:before{content:"";position:absolute;top:11px;left:50%;transform:translateX(-50%);width:74px;height:5px;border-radius:5px;background:#3a3845}
+  .browser{width:540px;border-radius:12px;background:var(--panel);border:1px solid var(--line2);box-shadow:0 18px 40px -20px #000;overflow:hidden;display:flex;flex-direction:column}
+  .browser .bar,.win .bar{height:32px;background:#100f17;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:6px;padding:0 12px}
+  .browser .bar i,.win .bar i{width:9px;height:9px;border-radius:50%;background:#3a3845}
+  .browser .bar .u{margin-left:8px;flex:1;background:#1d1c27;border-radius:6px;height:18px;display:flex;align-items:center;padding:0 10px;font-family:var(--mono);font-size:9px;color:var(--t3)}
+  .browser .body{padding:18px 20px;flex:1;display:flex;flex-direction:column;position:relative;min-height:300px}
+  .win{width:1040px;border-radius:12px;background:var(--panel);border:1px solid var(--line2);box-shadow:0 18px 40px -20px #000;overflow:hidden;display:flex;flex-direction:column}
+  .win .bar .u{margin-left:8px;flex:1;background:#1d1c27;border-radius:6px;height:18px;display:flex;align-items:center;padding:0 10px;font-family:var(--mono);font-size:9px;color:var(--t3)}
+  .win .body{padding:16px 20px;flex:1;display:flex;flex-direction:column;min-height:0}
+  .stage{width:580px;height:326px;border-radius:14px;background:var(--panel);border:1px solid var(--line2);box-shadow:0 18px 40px -20px #000;padding:20px 22px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+  .grid-bg{position:absolute;inset:0;opacity:.5;pointer-events:none;background-image:linear-gradient(var(--line2) 1px,transparent 1px),linear-gradient(90deg,var(--line2) 1px,transparent 1px);background-size:26px 26px;-webkit-mask:radial-gradient(360px 220px at 18% 8%,#000,transparent 70%);mask:radial-gradient(360px 220px at 18% 8%,#000,transparent 70%)}
+  /* ── atoms ── */
+  .top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2}
+  .logo{font-family:var(--pixel);font-size:12px}
+  .dot{font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px}
+  .live{color:var(--live)}.live:before{content:"●  ";font-size:8px;vertical-align:1px}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;padding:4px 9px;border-radius:20px;border:1px solid var(--line);color:var(--t2);background:rgba(255,255,255,.02)}
+  .pill.a{border-color:var(--a);color:#cdbcff;background:rgba(124,77,255,.12)}
+  .pill.b{border-color:var(--b);color:#dcff9a;background:rgba(197,255,58,.10)}
+  .pill.red{border-color:var(--live);color:#ffb3b3;background:rgba(255,92,92,.12)}
+  .pill.gold{border-color:var(--gold);color:#ffe49a;background:rgba(255,210,74,.12)}
+  .pixh{font-family:var(--pixel);line-height:1.35}
+  .ava{width:13px;height:13px;vertical-align:-2px;flex:0 0 auto}
+  .crn{width:26px;height:17px;vertical-align:-3px}
+  .crn.sm{width:15px;height:10px;vertical-align:-1px}
+  .rx{font-family:var(--mono);font-size:13px;width:30px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line2);border-radius:9px;background:rgba(255,255,255,.03)}
+  .label{font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:6px}
+  .label:before{content:"";width:14px;height:1px;background:var(--line)}
+  .btn{font-family:var(--mono);font-size:11px;font-weight:600;padding:10px 12px;border-radius:9px;text-align:center;border:1px solid var(--line);color:var(--text);background:rgba(255,255,255,.03)}
+  .btn.go{background:var(--a);border-color:var(--a);color:#fff;box-shadow:0 6px 16px -8px rgba(0,0,0,.5)}
+  .btn.lime{background:var(--b);border-color:var(--b);color:#1a2400}
+  .field{border:1px dashed var(--line);border-radius:10px;background:rgba(255,255,255,.02);padding:11px 12px;font-size:13px;color:var(--t2);line-height:1.4}
+  .center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:11px;position:relative;z-index:2}
+  .qr{width:104px;height:104px;border-radius:12px;background:repeating-linear-gradient(0deg,#fff 0 7px,#161520 7px 14px),#fff;border:6px solid #fff}
+  /* counter / wall / duel reused */
+  .counter{display:flex;align-items:baseline;gap:10px;justify-content:center}
+  .counter .big{font-family:var(--pixel);font-size:50px;color:var(--b);line-height:1}
+  .counter .lbl{font-family:var(--mono);font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:2px}
+  .phaserail{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--t3);justify-content:center}
+  .phaserail .now{color:var(--b);font-weight:600}
+  .wall{display:grid;grid-template-columns:repeat(16,1fr);gap:4px;position:relative;z-index:2}
+  .wall > i{aspect-ratio:1;border-radius:3px;background:linear-gradient(135deg,#3a3550,#272336);border:1px solid var(--line2)}
+  .wall > i.out{background:#1d1c25;border-color:#262430;opacity:.5;transform:scale(.9)}
+  .wall > i.live{border-color:var(--b);box-shadow:0 0 0 1px var(--b)}
+  .duel{display:flex;gap:12px;flex:1;align-items:stretch}
+  .duel .side{flex:1;border-radius:12px;border:1px solid var(--line2);display:flex;flex-direction:column;overflow:hidden}
+  .duel .side.a{border-color:var(--a)}.duel .side.b{border-color:var(--b)}
+  .duel .img{flex:1;min-height:60px}
+  .duel .side.a .img{background:linear-gradient(135deg,#4a3a78,#2c2740)}
+  .duel .side.b .img{background:linear-gradient(135deg,#3f4a22,#2b3018)}
+  .duel .nm{font-family:var(--mono);font-size:11px;padding:6px 9px;display:flex;justify-content:space-between}
+  .midvs{align-self:center;font-family:var(--pixel);font-size:15px;color:var(--t2)}
+  
+  
+  .crown{font-size:30px}
+  .streak{display:inline-flex;align-items:center;gap:7px;font-family:var(--pixel);font-size:13px;color:var(--gold)}
+  .lb{display:flex;flex-direction:column;gap:5px}
+  .lb .r{display:flex;align-items:center;gap:8px;font-size:12px;background:rgba(255,255,255,.03);border:1px solid var(--line2);border-radius:8px;padding:6px 9px}
+  .lb .r b{font-family:var(--mono);font-size:11px;color:var(--a);width:16px}
+  .lb .r .s{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--b)}
+  .lb .r.me{border-color:var(--a);background:rgba(124,77,255,.12)}
+  .agrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .agrid .c{border:1px solid var(--line2);border-radius:9px;overflow:hidden;background:var(--card)}
+  .agrid .c .im{height:58px;background:linear-gradient(135deg,#3a3550,#272336)}
+  .agrid .c .cap2{font-family:var(--mono);font-size:9px;padding:4px 6px;color:var(--t2);display:flex;justify-content:space-between}
+  .agrid .c.won{border-color:var(--b)}.agrid .c.won .cap2{color:var(--b)}
+  /* ════ BRACKET (the centerpiece) ════ */
+  .bktwrap{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;min-height:0}
+  .bkt{display:flex;flex:1;min-height:340px;gap:0}
+  .rnd{flex:1;display:flex;flex-direction:column;min-width:150px}
+  .rhd{font-family:var(--mono);font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;text-align:center;padding-bottom:8px;border-bottom:1px solid var(--line2);margin:0 12px 6px}
+  .rnd.champ-col .rhd{color:var(--gold)}
+  .ms{flex:1;display:flex;flex-direction:column}
+  .m{flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;padding:0 12px}
+  .card{background:var(--card);border:1px solid var(--line2);border-radius:8px;overflow:hidden;width:100%}
+  .tm{display:flex;align-items:center;gap:7px;min-height:30px;max-height:30px;padding:0 9px;font-family:var(--mono);font-size:11px;color:var(--t2);white-space:nowrap}
+  .tm + .tm{border-top:1px solid var(--line2)}
+  .tm .sd{color:var(--t3);font-size:9px;width:18px;flex:0 0 auto}
+  .tm .nmx{flex:1;min-width:0}
+  .tm .sc{font-size:10px;color:var(--t3);flex:0 0 auto}
+  .tm.wn{color:var(--text);box-shadow:inset 3px 0 0 var(--a);background:rgba(124,77,255,.10)}
+  .tm.wn .sd{color:#cdbcff}
+  .tm.wn .sc{color:var(--b)}
+  .card.liveM{border-color:var(--b);box-shadow:0 0 0 1px var(--b)}
+  .m.liveWrap:after{content:"● CANLI";position:absolute;left:50%;transform:translateX(-50%);top:2px;font-family:var(--mono);font-size:8px;color:var(--live)}
+  /* connectors: horizontal stub + vertical elbow (auto-scales via flex:1 + height:50%) */
+  .rnd:not(.last) .m::after{content:"";position:absolute;top:50%;left:calc(100% - 12px);width:12px;height:2px;background:var(--line)}
+  .rnd:not(.last) .m::before{content:"";position:absolute;left:100%;width:2px;height:50%;background:var(--line)}
+  .rnd:not(.last) .m:nth-of-type(odd)::before{top:50%}
+  .rnd:not(.last) .m:nth-of-type(even)::before{bottom:50%}
+  /* incoming stub into next round's match (left side) */
+  .rnd:not(.first) .m::marker{content:""}
+  .champ-node{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px}
+  .champ-node .card{border-color:var(--gold)}
+  .champ-node .tm{color:var(--gold)}.champ-node .tm .av{background:linear-gradient(135deg,var(--gold),#ffe9a8)}
+  /* notes */
+  .footnote{margin-top:30px;border-top:1px solid var(--line2);padding-top:22px;color:var(--t2);font-size:14px;line-height:1.7}
+  .footnote h3{font-family:var(--pixel);font-size:13px;margin:0 0 12px}
+  .tagrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .src{font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:8px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><symbol id="axo" viewBox="0 0 512 512" shape-rendering="crispEdges">
+  <g fill="#aed24a">
+    <rect x="64" y="64" width="32" height="32"/><rect x="96" y="32" width="32" height="80"/><rect x="128" y="64" width="32" height="32"/>
+    <rect x="208" y="16" width="32" height="96"/><rect x="240" y="0" width="32" height="112"/><rect x="272" y="16" width="32" height="96"/>
+    <rect x="352" y="64" width="32" height="32"/><rect x="384" y="32" width="32" height="80"/><rect x="416" y="64" width="32" height="32"/>
+  </g>
+  <g fill="#7c4dff">
+    <rect x="96" y="112" width="320" height="32"/><rect x="64" y="144" width="384" height="32"/>
+    <rect x="32" y="176" width="448" height="32"/><rect x="32" y="208" width="448" height="32"/><rect x="32" y="240" width="448" height="32"/>
+    <rect x="32" y="272" width="448" height="32"/><rect x="32" y="304" width="448" height="32"/><rect x="32" y="336" width="448" height="32"/>
+    <rect x="64" y="368" width="384" height="32"/><rect x="96" y="400" width="64" height="32"/><rect x="208" y="400" width="96" height="32"/><rect x="352" y="400" width="64" height="32"/>
+    <rect x="96" y="432" width="64" height="48"/><rect x="352" y="432" width="64" height="48"/>
+  </g>
+  <g fill="#f5f5f8">
+    <rect x="208" y="240" width="96" height="32"/><rect x="176" y="272" width="160" height="32"/><rect x="144" y="304" width="224" height="32"/><rect x="144" y="336" width="224" height="32"/><rect x="176" y="368" width="160" height="32"/>
+  </g>
+  <g fill="#ffffff"><rect x="96" y="208" width="64" height="64"/><rect x="352" y="208" width="64" height="64"/></g>
+  <g fill="#14121a"><rect x="128" y="224" width="32" height="48"/><rect x="352" y="224" width="32" height="48"/></g>
+  <g fill="#ffffff"><rect x="128" y="224" width="16" height="16"/><rect x="352" y="224" width="16" height="16"/></g>
+  <rect x="240" y="336" width="32" height="16" fill="#5a35cc"/>
+</symbol><symbol id="crown" viewBox="0 0 24 16" shape-rendering="crispEdges"><g fill="#ffd24a">
+  <rect x="2" y="10" width="20" height="4"/><rect x="2" y="4" width="4" height="8"/><rect x="10" y="2" width="4" height="10"/><rect x="18" y="4" width="4" height="8"/>
+  <rect x="9" y="0" width="6" height="2"/></g></symbol></svg>
+
+<div class="wrap">
+  <div class="brand">
+    <svg width="40" height="40"><use href="#axo"/></svg>
+    <div><h1>PROMPT CLASH · TURNUVA v3</h1>
+      <div class="tag">Yeni Bracket + Mobil &amp; Desktop · Test edildi (Playwright) · 2026-06-23</div></div>
+  </div>
+  <p class="lede">v3'te üç düzeltme: <b style="color:var(--text)">(1)</b> bracket sıfırdan · temiz esports ağacı, otomatik hizalı dallanmalar; <b style="color:var(--text)">(2)</b> her yüzeyin <b style="color:var(--b)">mobil + desktop</b> hali; <b style="color:var(--text)">(3)</b> implemente edilecek tüm ekranlar tek sette.</p>
+  <div class="legend">
+    <span><b style="background:var(--a)"></b>A / accent</span><span><b style="background:var(--b)"></b>B / izleyici</span>
+    <span><b style="background:var(--live)"></b>canlı/eleme</span><span><b style="background:var(--gold)"></b>şampiyon</span>
+  </div>
+
+  <!-- ═══════════ DESKTOP ═══════════ -->
+  <div class="band">DESKTOP · Admin · Sahne · Tarayıcı oyuncu</div>
+
+  <!-- ADMIN BRACKET (centerpiece) -->
+  <section class="surface">
+    <h2>ADMIN · Turnuva Ağacı (yeni, temiz dallanmalar)</h2>
+    <p class="sub">16 → 8 → 4 → final → şampiyon · canlı maç parlıyor · kazanan üst slota ilerler</p>
+    <div class="row">
+      <div class="step">
+        <div class="win">
+          <div class="bar"><i></i><i></i><i></i><div class="u">promptclash.app/admin/bracket · oda PROMPT-7Q2</div></div>
+          <div class="body">
+            <div class="top" style="margin-bottom:14px">
+              <span class="pill red">CANLI · YARI FİNAL</span>
+              <span class="dot">faz: 100 → 24 → 16 → … → 1 &nbsp;·&nbsp; zoom/pan</span>
+            </div>
+            <div class="bktwrap">
+              <div class="bkt">
+                <!-- Round of 8 -->
+                <div class="rnd first"><div class="rhd">SON 8</div><div class="ms">
+                  <div class="m"><div class="card"><div class="tm wn"><span class="sd">#1</span><span class="nmx">ayşe_x</span><span class="sc">90</span></div><div class="tm"><span class="sd">#8</span><span class="nmx">kaan</span><span class="sc">72</span></div></div></div>
+                  <div class="m"><div class="card"><div class="tm wn"><span class="sd">#4</span><span class="nmx">mert</span><span class="sc">84</span></div><div class="tm"><span class="sd">#5</span><span class="nmx">cem</span><span class="sc">78</span></div></div></div>
+                  <div class="m"><div class="card"><div class="tm wn"><span class="sd">#2</span><span class="nmx">zeynep</span><span class="sc">86</span></div><div class="tm"><span class="sd">#7</span><span class="nmx">nur</span><span class="sc">70</span></div></div></div>
+                  <div class="m"><div class="card"><div class="tm wn"><span class="sd">#3</span><span class="nmx">elif</span><span class="sc">82</span></div><div class="tm"><span class="sd">#6</span><span class="nmx">deniz</span><span class="sc">75</span></div></div></div>
+                </div></div>
+                <!-- Semis -->
+                <div class="rnd"><div class="rhd">YARI FİNAL</div><div class="ms">
+                  <div class="m liveWrap"><div class="card liveM"><div class="tm wn"><span class="sd">#1</span><span class="nmx">ayşe_x</span><span class="sc">51%</span></div><div class="tm"><span class="sd">#4</span><span class="nmx">mert</span><span class="sc">49%</span></div></div></div>
+                  <div class="m"><div class="card"><div class="tm"><span class="sd">#2</span><span class="nmx">zeynep</span><span class="sc">·</span></div><div class="tm"><span class="sd">#3</span><span class="nmx">elif</span><span class="sc">·</span></div></div></div>
+                </div></div>
+                <!-- Final -->
+                <div class="rnd last"><div class="rhd">FİNAL</div><div class="ms">
+                  <div class="m"><div class="card"><div class="tm"><span class="sd">?</span><span class="nmx">kazanan YF1</span><span class="sc">·</span></div><div class="tm"><span class="sd">?</span><span class="nmx">kazanan YF2</span><span class="sc">·</span></div></div></div>
+                </div></div>
+                <!-- Champion -->
+                <div class="rnd champ-col last" style="flex:.7"><div class="rhd">ŞAMPİYON</div>
+                  <div class="champ-node"><div class="crown" style="font-size:22px"><svg class="crn"><use href="#crown"/></svg></div><div class="card"><div class="tm"><span class="sd"><svg class="crn sm"><use href="#crown"/></svg></span><span class="nmx">?</span><span class="sc">ödül</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cap"><b>D-ADMIN-1</b> · Operatör bracket'i · dallanmalar otomatik hizalı, canlı yarı-final limon parlıyor. İlk turlar (100→24→16) faz olarak özetlenir, ağaç finalleri çizer.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAGE (desktop big screen) -->
+  <section class="surface">
+    <h2>SAHNE · Büyük Ekran (1920×1080 → desktop)</h2>
+    <p class="sub">KALAN sayacı + küçülen duvar → ŞİMDİ KAPIŞIYOR → şampiyon</p>
+    <div class="row">
+      <div class="step">
+        <div class="stage"><div class="grid-bg"></div>
+          <div class="top"><span class="pill red">TUR 1 BİTTİ</span><span class="dot">duvar boşalıyor</span></div>
+          <div style="position:relative;z-index:2;display:flex;flex-direction:column;gap:10px;flex:1;justify-content:center">
+            <div class="counter"><span class="big">24</span><span class="lbl">KALAN<br/>oyuncu</span></div>
+            <div class="phaserail"><span class="now">100</span>→24→6→2</div>
+            <div class="wall"><i class="live"></i><i></i><i></i><i class="out"></i><i></i><i class="out"></i><i></i><i></i><i class="out"></i><i></i><i></i><i class="out"></i><i></i><i class="out"></i><i></i><i></i><i class="out"></i><i></i><i class="out"></i><i></i><i class="out"></i><i></i><i></i><i class="out"></i><i class="out"></i><i></i><i class="out"></i><i></i><i class="out"></i><i></i><i class="out"></i><i class="out"></i></div>
+          </div>
+        </div>
+        <div class="cap"><b>D-STAGE-1</b> · Dev "KALAN" sayacı + küçülen duvar</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="stage"><div class="grid-bg"></div>
+          <div class="top"><span class="pill b">ŞİMDİ KAPIŞIYOR</span><span class="dot live">FİNAL</span></div>
+          <div class="duel" style="margin-top:10px">
+            <div class="side a"><div class="img"></div><div class="nm"><span><svg class="ava"><use href="#axo"/></svg> ayşe_x</span><span>#1</span></div></div>
+            <div class="midvs">VS</div>
+            <div class="side b"><div class="img"></div><div class="nm"><span><svg class="ava"><use href="#axo"/></svg> mert</span><span>#4</span></div></div>
+          </div>
+        </div>
+        <div class="cap"><b>D-STAGE-2</b> · "Şimdi kapışıyor" düello kartı</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="stage" style="background:linear-gradient(180deg,rgba(255,210,74,.10),var(--panel))"><div class="grid-bg"></div>
+          
+          <div class="top"><span class="logo">ŞAMPİYON</span><span class="dot">100 → 1</span></div>
+          <div class="center"><div class="crown"><svg class="crn"><use href="#crown"/></svg></div><svg width="46" height="46"><use href="#axo"/></svg><div class="pixh" style="font-size:22px;color:var(--gold)">ayşe_x</div><div class="pill gold"><svg class="crn sm"><use href="#crown"/></svg> BİRİNCİ · ödül</div></div>
+        </div>
+        <div class="cap"><b>D-STAGE-3</b> · Taç + konfeti finali</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESKTOP PLAYER (browser) -->
+  <section class="surface">
+    <h2>TARAYICI OYUNCU · Desktop (evden uzaktan katılan)</h2>
+    <p class="sub">aynı oyun, geniş layout · sol prompt / sağ izleyici-sahne</p>
+    <div class="row">
+      <div class="step">
+        <div class="browser">
+          <div class="bar"><i></i><i></i><i></i><div class="u">promptclash.app/r/7Q2</div></div>
+          <div class="body" style="flex-direction:row;gap:16px">
+            <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+              <span class="pill red">TUR 2 · 00:18</span>
+              <div class="label">KONU</div>
+              <div class="pixh" style="font-size:16px;color:var(--b)">DANS EDEN<br/>TOST MAKİNESİ</div>
+              <div class="field" style="flex:1">disko ışıkları altında break dance yapan retro tost makinesi…</div>
+              <div class="btn go">GÖNDER →</div>
+            </div>
+            <div style="width:200px;display:flex;flex-direction:column;gap:8px;border-left:1px solid var(--line2);padding-left:16px">
+              <div class="label">CANLI SAHNE</div>
+              <div style="aspect-ratio:16/9;border-radius:8px;background:linear-gradient(135deg,#3a3550,#272336);border:1px solid var(--line2)"></div>
+              <div class="counter" style="justify-content:flex-start"><span class="big" style="font-size:30px">24</span><span class="lbl">kalan</span></div>
+              <div class="dot">sen + 23 kişi yarışta</div>
+            </div>
+          </div>
+        </div>
+        <div class="cap"><b>D-PLAYER-1</b> · Desktop oyuncu · geniş ekran, prompt + canlı sahne yan yana</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="browser">
+          <div class="bar"><i></i><i></i><i></i><div class="u">promptclash.app/r/7Q2 · izleyici</div></div>
+          <div class="body">
+            <div class="top" style="margin-bottom:12px"><span class="pill b">ARTIK JÜRİSİN </span><span class="dot live">TUR 3 · oyla</span></div>
+            <div class="label" style="margin-bottom:10px">KALAN GÖRSELLER · EN İYİYİ SEÇ</div>
+            <div class="agrid">
+              <div class="c won"><div class="im"></div><div class="cap2"><span>ayşe_x</span><span>91</span></div></div>
+              <div class="c"><div class="im"></div><div class="cap2"><span>mert</span><span>oy ✓</span></div></div>
+              <div class="c"><div class="im"></div><div class="cap2"><span>zeynep</span><span>oy</span></div></div>
+              <div class="c"><div class="im"></div><div class="cap2"><span>elif</span><span>oy</span></div></div>
+            </div>
+            <div class="dot" style="margin-top:auto">Senin oyun finali belirliyor · doğru tahmin = jüri puanı (İzleyici MVP)</div>
+          </div>
+        </div>
+        <div class="cap"><b>D-PLAYER-2</b> · Desktop izleyici/jüri · görsel grid + oy</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ MOBILE ═══════════ -->
+  <div class="band mob">MOBİL · Telefon oyuncu &amp; izleyici (aynı akış, dikey)</div>
+
+  <section class="surface">
+    <h2>TELEFON · Dopamin Döngüsü</h2>
+    <p class="sub">katıl → yaz → kazandın(streak) / elendin(yumuşak iniş) → jüri → oyla</p>
+    <div class="row">
+
+      <div class="step">
+        <div class="phone">
+          <div class="top" style="margin-top:6px"><span class="logo" style="font-size:11px">PROMPT CLASH</span><span class="dot live">CANLI</span></div>
+          <div class="center"><div class="qr"></div><div class="pixh" style="font-size:12px">QR OKUT &amp; KATIL</div><div class="pill a"><svg class="ava"><use href="#axo"/></svg> 100/100</div></div>
+          <div class="btn go">KATILDIM ✓</div>
+        </div>
+        <div class="cap"><b>M-1</b> · Katıl (mobil lobi)</div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="phone">
+          <div class="top" style="margin-top:6px"><span class="pill red">TUR 2</span><span class="dot">00:18</span></div>
+          <div class="label" style="margin:14px 0 8px">KONU</div>
+          <div class="pixh" style="font-size:15px;color:var(--b);margin-bottom:12px">DANS EDEN TOST MAKİNESİ</div>
+          <div class="field" style="flex:1">disko ışıkları altında break dance yapan retro tost makinesi…</div>
+          <div class="btn go" style="margin-top:12px">GÖNDER →</div>
+        </div>
+        <div class="cap"><b>M-2</b> · Prompt yaz</div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="phone" style="background:linear-gradient(180deg,rgba(197,255,58,.08),var(--panel))">
+          
+          <div class="top" style="margin-top:6px"><span class="pill b">GEÇTİN! </span><span class="dot">tur 2</span></div>
+          <div class="center"><div style="width:84px;height:84px;border-radius:14px;border:2px solid var(--b);background:linear-gradient(135deg,#3a3550,#272336)"></div><div class="streak">3 SERİ</div><div class="pixh" style="font-size:13px;color:var(--b)">88 PUAN · 2.</div></div>
+          <div class="btn lime">SONRAKİ TURA HAZIRIM</div>
+        </div>
+        <div class="cap"><b>M-3a</b> · Kazandın → streak + kutlama</div>
+      </div>
+      <div class="arrow">/</div>
+
+      <div class="step">
+        <div class="phone">
+          <div class="top" style="margin-top:6px"><span class="pill">SON DURAĞIN</span><span class="dot">tur 3</span></div>
+          <div class="center" style="gap:9px">
+            <div class="pixh" style="font-size:15px;color:var(--gold)">TOP 24</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.5">100 kişiden <b style="color:var(--text)">24.</b> oldun ·<br/><b style="color:var(--b)">76 kişiyi geçtin!</b> 👏</div>
+            <div style="width:100%;border:1px solid var(--line2);border-radius:12px;padding:10px;background:linear-gradient(180deg,rgba(124,77,255,.10),transparent)"><div style="height:64px;border-radius:8px;background:linear-gradient(135deg,#3a3550,#272336);border:1px solid var(--line2)"></div></div>
+          </div>
+          <div class="btn lime">RUN'INI PAYLAŞ</div>
+        </div>
+        <div class="cap"><b>M-3b</b> · Elendin → başarı kartı (rage-quit önler)</div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="phone">
+          <div class="top" style="margin-top:6px"><span class="pill red">FİNAL · OYLA</span><span class="dot">00:08</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px;flex:1;margin-top:10px">
+            <div style="flex:1;border-radius:12px;border:2px solid var(--a);background:linear-gradient(135deg,#4a3a78,#2c2740);display:flex;align-items:flex-end;padding:8px"><span class="pill a"><svg class="ava"><use href="#axo"/></svg> ayşe_x</span></div>
+            <div style="text-align:center;font-family:var(--pixel);font-size:10px;color:var(--t3)">· hangisi? ·</div>
+            <div style="flex:1;border-radius:12px;border:1px solid var(--line2);background:linear-gradient(135deg,#3f4a22,#2b3018);display:flex;align-items:flex-end;padding:8px"><span class="pill b"><svg class="ava"><use href="#axo"/></svg> mert</span></div>
+          </div>
+          <div style="display:flex;gap:6px;justify-content:center;margin-top:10px"><span class="rx" style="color:var(--b)">♥</span><span class="rx" style="color:#cdbcff">▲</span><span class="rx" style="color:var(--gold)">★</span><span class="rx" style="color:var(--live)">✕</span></div>
+        </div>
+        <div class="cap"><b>M-4</b> · Tap-to-vote + emoji (jüri)</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- NOTES -->
+  <div class="footnote">
+    <h3>📌 v3 · NE DEĞİŞTİ &amp; İMPLEMENTASYON SETİ</h3>
+    <p>• <b>Yeni bracket</b> (D-ADMIN-1): flex tabanlı, <b>otomatik hizalı dallanmalar</b> (connector'lar her tura kendiliğinden ölçeklenir), seed rozetleri, canlı maç limon parıltısı, şampiyon altın node. Sahneye taşınmaz · orada KALAN sayacı + duvar var.</p>
+    <p>• <b>Mobil + Desktop</b>: oyuncu/izleyici hem telefon (M-1…4) hem tarayıcı (D-PLAYER-1,2) için çizildi; aynı tasarım dili, responsive layout.</p>
+    <p>• <b>İmplemente edilecek tam set:</b> Admin(kurulum + bracket), Sahne(sayaç/duvar + düello + şampiyon), Tarayıcı oyuncu(yarış + jüri), Telefon(katıl→yaz→sonuç→jüri→oy). Hepsi tek dosyada, Playwright ile render testi yapıldı.</p>
+    <div class="tagrow">
+      <span class="pill gold">yeni bracket ✓</span><span class="pill b">mobil+desktop ✓</span>
+      <span class="pill a">dopamin loop ✓</span><span class="pill">Playwright test ✓</span>
+      <span class="pill red">sıradaki: kodda admin bracket + sahne duvarı</span>
+    </div>
+    <div class="src">Araştırma: Jackbox/Kahoot/Gartic, Compulsion loops &amp; dopamine, Eurovision, Fortnite spectate, FACEIT/Challonge/KeepTheScore bracket UX.</div>
+  </div>
+</div>
+</body>
+</html>
