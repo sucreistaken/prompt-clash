@@ -179,12 +179,16 @@ function PanelBody({ roomId, roomCode, roomName, audienceEnabled, origin }: Prop
       <div style={containerStyle} className="pc-host-container">
         <AppHeader right={<RolePill kind="host" label={t('roomRoleHost')} />} />
 
-        {/* HEAD — sade başlık */}
+        {/* HEAD — arcade lobby başlığı: eyebrow pill + pixel başlık */}
         <section style={headStyle}>
+          <span style={eyebrowStyle}>
+            <span aria-hidden="true" style={eyebrowDotStyle} />
+            {t('roomReadyEyebrow')}
+            {roomName ? <span style={eyebrowRoomNameStyle}>· {roomName}</span> : null}
+          </span>
           <h1 style={h1Style}>
             {t('roomReadyH1')}{' '}
             <span style={{ color: 'var(--pc-lime, #aed24a)' }}>{t('roomReadyAc')}</span>
-            {roomName ? <span style={roomNameInlineStyle}> · {roomName}</span> : null}
           </h1>
           <p style={subStyle}>{t('roomReadySubV2')}</p>
         </section>
@@ -202,11 +206,13 @@ function PanelBody({ roomId, roomCode, roomName, audienceEnabled, origin }: Prop
               type="button"
               onClick={copyCode}
               aria-label={t('ariaCopyCode')}
-              title={copiedCode ? t('roomCopied') : t('roomCopy')}
               className={copiedCode ? 'pc-copy-icon pc-copy-icon--ok' : 'pc-copy-icon'}
               style={copyIconStyle}
             >
               {copiedCode ? <CheckGlyph /> : <CopyGlyph />}
+              <span style={copyIconLabelStyle}>
+                {copiedCode ? t('roomCopied') : t('roomCopyCodeLabel')}
+              </span>
             </button>
           </div>
 
@@ -244,20 +250,25 @@ function PanelBody({ roomId, roomCode, roomName, audienceEnabled, origin }: Prop
                 type="button"
                 onClick={joinAsPlayer}
                 className="pc-cta-ghost"
-                style={ctaGhostCompactStyle}
-                title={t('roomJoinAsPlayerHint')}
+                style={hostOpenBtnStyle}
               >
-                <JoinSelfGlyph />
-                {t('roomJoinAsPlayer')}
+                <span style={hostOpenBtnHeadStyle}>
+                  <JoinSelfGlyph />
+                  {t('roomJoinAsPlayer')}
+                </span>
+                <span style={hostOpenBtnDescStyle}>{t('roomJoinAsPlayerDesc')}</span>
               </button>
               <button
                 type="button"
                 onClick={openStage}
                 className="pc-cta-ghost"
-                style={ctaGhostCompactStyle}
+                style={hostOpenBtnStyle}
               >
-                <OpenExtGlyph />
-                {t('roomOpenStageShort')}
+                <span style={hostOpenBtnHeadStyle}>
+                  <OpenExtGlyph />
+                  {t('roomOpenStageShort')}
+                </span>
+                <span style={hostOpenBtnDescStyle}>{t('roomOpenStageDesc')}</span>
               </button>
             </div>
           </div>
@@ -291,7 +302,18 @@ function PanelBody({ roomId, roomCode, roomName, audienceEnabled, origin }: Prop
           <>
             {/* LOBBY STATUS */}
             <section style={lobbyStyle} className="pc-lobby">
-              <MascotFrame size={96} mascotSize={76} variant="default" />
+              <div style={lobbyMascotHostStyle}>
+                <div style={lobbyBubbleStyle}>
+                  <span aria-hidden="true" style={lobbyBubbleDotStyle} />
+                  {t('roomLobbyMascotBubble')}
+                  <span
+                    aria-hidden="true"
+                    className="pc-lobby-bubble-tail"
+                    style={lobbyBubbleTailStyle}
+                  />
+                </div>
+                <MascotFrame size={96} mascotSize={76} variant="default" particles />
+              </div>
               <h2 style={lobbyTtlStyle}>{t('roomLobbyTtl')}</h2>
               <p style={lobbyBodyStyle}>{t(lobbyBodyKey)}</p>
 
@@ -322,7 +344,7 @@ function PanelBody({ roomId, roomCode, roomName, audienceEnabled, origin }: Prop
                 className={canStart ? 'pc-start pc-start--ready' : 'pc-start pc-start--off'}
                 style={canStart ? startCtaReadyStyle : startCtaOffStyle}
               >
-                <PlayGlyph />
+                {canStart ? <PlayGlyph /> : <LockGlyph />}
                 {t('roomCtrlStart')}
               </button>
               {!canStart ? (
@@ -405,12 +427,15 @@ function PanelBody({ roomId, roomCode, roomName, audienceEnabled, origin }: Prop
         .pc-share-btn--ok { border-color: #aed24a !important; color: #aed24a !important; background: rgba(174,210,74,.10) !important; }
 
         .pc-start--ready { animation: pcStartPulse 2.4s ease-in-out infinite; }
-        .pc-start--ready:hover { box-shadow: 0 18px 40px rgba(174,210,74,.40), inset 0 -2px 0 rgba(0,0,0,.18); }
-        .pc-start--ready:active { transform: translateY(1px); }
+        .pc-start--ready:hover { box-shadow: 0 5px 0 #6f8c2a, 0 10px 30px rgba(174,210,74,.42); filter: brightness(1.04); }
+        .pc-start--ready:active { transform: translateY(3px); box-shadow: 0 2px 0 #6f8c2a; }
         @keyframes pcStartPulse {
-          0%, 100% { box-shadow: 0 12px 28px rgba(174,210,74,.28), inset 0 -2px 0 rgba(0,0,0,.18); }
-          50% { box-shadow: 0 18px 40px rgba(174,210,74,.46), inset 0 -2px 0 rgba(0,0,0,.18); }
+          0%, 100% { box-shadow: 0 5px 0 #6f8c2a, 0 7px 20px rgba(174,210,74,.22); }
+          50% { box-shadow: 0 5px 0 #6f8c2a, 0 10px 30px rgba(174,210,74,.42); }
         }
+
+        .pc-blink { animation: pcBlink 1s step-end infinite; }
+        @keyframes pcBlink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
 
         .pc-close-link { transition: color .14s, border-color .14s; }
         .pc-close-link:hover { color: var(--pc-live, #ff5c5c); border-color: rgba(255,92,92,.35); }
@@ -423,6 +448,7 @@ function PanelBody({ roomId, roomCode, roomName, audienceEnabled, origin }: Prop
         }
         @media (prefers-reduced-motion: reduce) {
           .pc-start--ready { animation: none !important; }
+          .pc-blink { animation: none !important; }
         }
       `}</style>
     </div>
@@ -437,9 +463,19 @@ function Slot({ index, player }: { index: 1 | 2; player: PlayerSlot }) {
   return (
     <div style={filled ? slotFilledStyle : slotEmptyStyle} aria-label={`${t('roomSlotPlayer')} ${index}`}>
       <span style={slotIdxStyle}>{`${t('roomSlotPlayer')} ${index}`}</span>
-      <span style={filled ? slotNickStyle : slotPendingStyle}>
-        {filled ? player!.nickname : t('roomSlotPending')}
+      <span style={filled ? slotAvatarFilledStyle : slotAvatarEmptyStyle} aria-hidden="true">
+        {filled ? player!.nickname.slice(0, 1).toUpperCase() : String(index)}
       </span>
+      {filled ? (
+        <span style={slotNickStyle}>{player!.nickname}</span>
+      ) : (
+        <span style={slotPendingStyle}>
+          {t('roomSlotPending')}
+          <span className="pc-blink" style={slotCursorStyle} aria-hidden="true">
+            _
+          </span>
+        </span>
+      )}
     </div>
   );
 }
@@ -541,7 +577,7 @@ function TournamentControlSection({
               className={canStart ? 'pc-start pc-start--ready' : 'pc-start pc-start--off'}
               style={canStart ? startCtaReadyStyle : startCtaOffStyle}
             >
-              <PlayGlyph />
+              {canStart ? <PlayGlyph /> : <LockGlyph />}
               {t('tCtrlStartTournament')}
             </button>
             {!canStart ? (
@@ -649,6 +685,15 @@ function PlayGlyph() {
   );
 }
 
+function LockGlyph() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="4" y="11" width="16" height="10" rx="1.5" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </svg>
+  );
+}
+
 function JoinSelfGlyph() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -681,25 +726,53 @@ const containerStyle: CSSProperties = {
 const headStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 8,
+  alignItems: 'flex-start',
+  gap: 10,
   padding: '14px 0 18px',
 };
 
-const h1Style: CSSProperties = {
+// Eyebrow pill — create-room "YENİ ODA" rozetiyle aynı dil.
+const eyebrowStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
+  padding: '4px 10px',
+  borderRadius: 3,
+  background: 'rgba(124,77,255,0.10)',
+  border: '1px solid rgba(124,77,255,0.40)',
   fontFamily: "'Inter Tight', system-ui, sans-serif",
-  fontSize: 'clamp(22px, 5.4vw, 28px)',
+  fontSize: 10.5,
   fontWeight: 700,
-  color: 'var(--pc-bone)',
-  lineHeight: 1.2,
-  letterSpacing: '-0.005em',
-  margin: 0,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: 'var(--pc-accent)',
 };
 
-const roomNameInlineStyle: CSSProperties = {
-  fontSize: '0.62em',
-  fontWeight: 500,
+const eyebrowDotStyle: CSSProperties = {
+  width: 6,
+  height: 6,
+  background: 'var(--pc-accent)',
+  flex: 'none',
+  boxShadow: '0 0 8px rgba(124,77,255,0.5)',
+};
+
+const eyebrowRoomNameStyle: CSSProperties = {
   color: 'var(--pc-text3)',
-  letterSpacing: 0,
+  letterSpacing: '0.04em',
+  textTransform: 'none',
+  fontWeight: 600,
+};
+
+// Pixel başlık — create-room "BIR ODA AÇ." ile aynı Silkscreen dili.
+const h1Style: CSSProperties = {
+  fontFamily: "'Silkscreen', monospace",
+  fontSize: 'clamp(22px, 6vw, 30px)',
+  fontWeight: 400,
+  color: 'var(--pc-bone)',
+  lineHeight: 1.15,
+  letterSpacing: '0.02em',
+  textTransform: 'uppercase',
+  margin: 0,
 };
 
 const subStyle: CSSProperties = {
@@ -732,11 +805,19 @@ const lblLineStyle: CSSProperties = {
   flex: 'none',
 };
 
-// Invite card (single, hero)
-const inviteCardStyle: CSSProperties = {
+// Arcade konsol paneli — create-room formStyle ile aynı: sert kenar + 3px accent
+// üst-cap + hard-offset gölge. SaaS yumuşaklığı yerine kabin hissi.
+const consolePanelStyle: CSSProperties = {
   background: 'var(--pc-ink2)',
-  border: '1.5px solid var(--pc-line)',
-  borderRadius: 14,
+  border: '2px solid var(--pc-line2)',
+  borderTop: '3px solid var(--pc-accent)',
+  borderRadius: 6,
+  boxShadow: '6px 6px 0 rgba(0,0,0,0.32)',
+};
+
+// Invite card (single, hero) — arcade panel
+const inviteCardStyle: CSSProperties = {
+  ...consolePanelStyle,
   padding: '18px 18px 14px',
   display: 'flex',
   flexDirection: 'column',
@@ -762,30 +843,40 @@ const codeRowStyle: CSSProperties = {
   flexWrap: 'wrap',
 };
 
+// Oda kodu — terminal/arcade hissi için JetBrains Mono.
 const codeStyle: CSSProperties = {
-  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
   fontSize: 'clamp(34px, 9vw, 46px)',
   color: 'var(--pc-bone)',
-  letterSpacing: '0.10em',
+  letterSpacing: '0.12em',
   lineHeight: 1,
   flex: 1,
   minWidth: 0,
-  fontWeight: 500,
+  fontWeight: 700,
 };
 
+// Kod kopya — sadece ikon değil, etiketli arcade chip (aksiyon net olsun).
 const copyIconStyle: CSSProperties = {
-  width: 44,
-  height: 44,
-  padding: 0,
-  background: 'transparent',
-  border: '1.5px solid var(--pc-line)',
-  borderRadius: 10,
+  minHeight: 44,
+  padding: '0 12px',
+  background: 'var(--pc-ink3)',
+  border: '1px solid var(--pc-line)',
+  borderRadius: 4,
+  boxShadow: '0 2px 0 var(--pc-ink)',
   color: 'var(--pc-text2)',
   cursor: 'pointer',
   display: 'inline-flex',
   alignItems: 'center',
-  justifyContent: 'center',
+  gap: 8,
   flex: 'none',
+};
+
+const copyIconLabelStyle: CSSProperties = {
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase',
 };
 
 // Invite actions — primary + ghost
@@ -795,33 +886,35 @@ const inviteActionsStyle: CSSProperties = {
   gap: 10,
 };
 
+// Birincil aksiyon — blok arcade tuşu (soft glow yerine hard-offset taban).
 const ctaPrimaryStyle: CSSProperties = {
   width: '100%',
   minHeight: 52,
   padding: '0 16px',
-  borderRadius: 12,
-  border: 'none',
+  borderRadius: 4,
+  border: '2px solid #5a35cc',
   cursor: 'pointer',
   background: 'var(--pc-accent)',
   color: '#fff',
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 14.5,
-  fontWeight: 700,
+  fontWeight: 800,
+  letterSpacing: '0.02em',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   gap: 10,
-  boxShadow: '0 10px 26px rgba(124,77,255,0.30), inset 0 -2px 0 rgba(0,0,0,0.18)',
+  boxShadow: '0 4px 0 #4a2bb0',
 };
 
 const ctaGhostStyle: CSSProperties = {
   width: '100%',
   minHeight: 52,
   padding: '0 16px',
-  borderRadius: 12,
-  background: 'transparent',
+  borderRadius: 4,
+  background: 'var(--pc-ink3)',
   color: 'var(--pc-text)',
-  border: '1.5px solid var(--pc-line)',
+  border: '1px solid var(--pc-line)',
   cursor: 'pointer',
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 13.5,
@@ -831,6 +924,7 @@ const ctaGhostStyle: CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   gap: 10,
+  boxShadow: '0 2px 0 var(--pc-ink)',
 };
 
 // "Bu cihazda aç" host-test grubu — paylaşımdan visually ayrılsın diye
@@ -862,23 +956,42 @@ const hostOpenRowStyle: CSSProperties = {
   gap: 8,
 };
 
-const ctaGhostCompactStyle: CSSProperties = {
+// Host-test butonları — iki satır: aksiyon + ne yaptığı (Sahne herkese net değil).
+const hostOpenBtnStyle: CSSProperties = {
   width: '100%',
-  minHeight: 44,
-  padding: '0 12px',
-  borderRadius: 10,
-  background: 'transparent',
+  minHeight: 52,
+  padding: '8px 12px',
+  borderRadius: 4,
+  background: 'var(--pc-ink3)',
   color: 'var(--pc-text)',
-  border: '1.5px solid var(--pc-line)',
+  border: '1px solid var(--pc-line)',
+  boxShadow: '0 2px 0 var(--pc-ink)',
   cursor: 'pointer',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  justifyContent: 'center',
+  gap: 2,
+  textAlign: 'left',
+};
+
+const hostOpenBtnHeadStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 12.5,
   fontWeight: 700,
   letterSpacing: '0.03em',
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 8,
+  color: 'var(--pc-text)',
+};
+
+const hostOpenBtnDescStyle: CSSProperties = {
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 11,
+  fontWeight: 500,
+  color: 'var(--pc-text3)',
+  lineHeight: 1.3,
 };
 
 // Accordion
@@ -890,13 +1003,16 @@ const detailsStyle: CSSProperties = {
 
 const summaryStyle: CSSProperties = {
   cursor: 'pointer',
-  padding: '12px 4px',
+  padding: '12px 14px',
   display: 'flex',
   alignItems: 'center',
-  gap: 8,
+  gap: 10,
+  background: 'var(--pc-ink3)',
+  border: '1px solid var(--pc-line)',
+  borderRadius: 4,
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 12.5,
-  fontWeight: 600,
+  fontWeight: 700,
   letterSpacing: '0.04em',
   color: 'var(--pc-text2)',
   userSelect: 'none',
@@ -956,13 +1072,11 @@ const shareBtnStyle: CSSProperties = {
   minHeight: 32,
 };
 
-// Lobby
+// Lobby — arcade panel
 const lobbyStyle: CSSProperties = {
+  ...consolePanelStyle,
   marginTop: 22,
-  background: 'var(--pc-ink2)',
-  border: '1.5px solid var(--pc-line)',
-  borderRadius: 14,
-  padding: '24px 18px 22px',
+  padding: '20px 18px 20px',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -988,38 +1102,87 @@ const lobbyBodyStyle: CSSProperties = {
   maxWidth: '38ch',
 };
 
+// Maskot + konuşma balonu (create-room bubble diliyle).
+const lobbyMascotHostStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 14,
+};
+
+const lobbyBubbleStyle: CSSProperties = {
+  position: 'relative',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
+  maxWidth: '32ch',
+  padding: '8px 14px',
+  borderRadius: 4,
+  background: 'rgba(174,210,74,0.12)',
+  border: '2px solid rgba(174,210,74,0.46)',
+  boxShadow: '0 3px 0 rgba(0,0,0,0.22)',
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: '0.02em',
+  color: '#aed24a',
+  textShadow: '0 0 12px rgba(174,210,74,0.30)',
+  lineHeight: 1.35,
+};
+
+const lobbyBubbleDotStyle: CSSProperties = {
+  width: 6,
+  height: 6,
+  background: '#aed24a',
+  flex: 'none',
+  boxShadow: '0 0 8px rgba(174,210,74,0.6)',
+};
+
+const lobbyBubbleTailStyle: CSSProperties = {
+  position: 'absolute',
+  left: '50%',
+  bottom: -8,
+  width: 12,
+  height: 12,
+  transform: 'translateX(-50%) rotate(45deg)',
+  background: 'rgba(174,210,74,0.12)',
+  borderRight: '2px solid rgba(174,210,74,0.46)',
+  borderBottom: '2px solid rgba(174,210,74,0.46)',
+};
+
 const slotsRowStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'stretch',
   justifyContent: 'center',
-  gap: 8,
-  marginTop: 10,
+  gap: 10,
+  marginTop: 12,
   width: '100%',
-  maxWidth: 360,
+  maxWidth: 380,
 };
 
 const slotBaseStyle: CSSProperties = {
   flex: 1,
   minWidth: 0,
-  padding: '12px 10px',
-  borderRadius: 10,
+  padding: '16px 12px',
+  borderRadius: 4,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  gap: 4,
+  gap: 9,
   textAlign: 'center',
 };
 
 const slotEmptyStyle: CSSProperties = {
   ...slotBaseStyle,
-  background: 'transparent',
-  border: '1.5px dashed var(--pc-ink3)',
+  background: 'var(--pc-ink)',
+  border: '2px dashed var(--pc-line2)',
 };
 
 const slotFilledStyle: CSSProperties = {
   ...slotBaseStyle,
-  background: 'rgba(124,77,255,0.10)',
-  border: '1.5px solid var(--pc-accent)',
+  background: 'rgba(124,77,255,0.12)',
+  border: '2px solid var(--pc-accent)',
+  boxShadow: 'inset 0 -3px 0 rgba(124,77,255,0.30)',
 };
 
 const slotIdxStyle: CSSProperties = {
@@ -1031,11 +1194,47 @@ const slotIdxStyle: CSSProperties = {
   color: 'var(--pc-text3)',
 };
 
-const slotPendingStyle: CSSProperties = {
-  fontFamily: "'Inter Tight', system-ui, sans-serif",
-  fontSize: 13,
+// Pixel avatar kutusu — boşken slot numarası, dolunca baş harf.
+const slotAvatarBaseStyle: CSSProperties = {
+  width: 44,
+  height: 44,
+  borderRadius: 4,
+  display: 'grid',
+  placeItems: 'center',
+  fontFamily: "'Silkscreen', monospace",
+  fontSize: 18,
+  lineHeight: 1,
+};
+
+const slotAvatarEmptyStyle: CSSProperties = {
+  ...slotAvatarBaseStyle,
+  background: 'var(--pc-ink2)',
+  border: '2px solid var(--pc-line2)',
   color: 'var(--pc-text4)',
-  fontStyle: 'italic',
+};
+
+const slotAvatarFilledStyle: CSSProperties = {
+  ...slotAvatarBaseStyle,
+  background: 'var(--pc-accent)',
+  border: '2px solid var(--pc-bone)',
+  color: '#fff',
+};
+
+const slotPendingStyle: CSSProperties = {
+  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+  fontSize: 12.5,
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase',
+  color: 'var(--pc-text3)',
+  fontWeight: 700,
+  display: 'inline-flex',
+  alignItems: 'center',
+};
+
+const slotCursorStyle: CSSProperties = {
+  marginLeft: 1,
+  color: '#aed24a',
+  fontWeight: 700,
 };
 
 const slotNickStyle: CSSProperties = {
@@ -1049,16 +1248,17 @@ const slotNickStyle: CSSProperties = {
   whiteSpace: 'nowrap',
 };
 
+// VS — pixel rozet, sahne dilindeki gibi.
 const vsStyle: CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   alignSelf: 'center',
-  fontFamily: "'Inter Tight', system-ui, sans-serif",
-  fontSize: 11,
-  fontWeight: 800,
-  letterSpacing: '0.22em',
-  color: 'var(--pc-text3)',
+  fontFamily: "'Silkscreen', monospace",
+  fontSize: 13,
+  fontWeight: 400,
+  letterSpacing: '0.04em',
+  color: 'var(--pc-lime, #aed24a)',
   padding: '0 4px',
 };
 
@@ -1097,12 +1297,13 @@ const ctaWrapStyle: CSSProperties = {
   gap: 10,
 };
 
+// Ready — blok lime arcade tuşu, hard-offset taban (pulse class style bloğunda).
 const startCtaReadyStyle: CSSProperties = {
   width: '100%',
   minHeight: 62,
   padding: '0 18px',
-  borderRadius: 14,
-  border: 'none',
+  borderRadius: 4,
+  border: '2px solid #7a9c2e',
   cursor: 'pointer',
   background: 'linear-gradient(180deg, #b8de4f, #9bc23a)',
   color: '#0c1410',
@@ -1114,35 +1315,44 @@ const startCtaReadyStyle: CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   gap: 10,
-  boxShadow: '0 12px 28px rgba(174,210,74,0.28), inset 0 -2px 0 rgba(0,0,0,0.18)',
+  boxShadow: '0 5px 0 #6f8c2a',
 };
 
+// Off — ölü-dashed değil, görünür "kilitli tuş": dolu zemin + sert taban + kilit.
 const startCtaOffStyle: CSSProperties = {
   width: '100%',
   minHeight: 62,
   padding: '0 18px',
-  borderRadius: 14,
-  border: '1.5px dashed var(--pc-ink3)',
+  borderRadius: 4,
+  border: '2px solid var(--pc-line2)',
   cursor: 'not-allowed',
-  background: 'transparent',
-  color: 'var(--pc-text4)',
+  background: 'var(--pc-ink3)',
+  color: 'var(--pc-text2)',
   fontFamily: "'Inter Tight', system-ui, sans-serif",
   fontSize: 16,
-  fontWeight: 700,
+  fontWeight: 800,
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   gap: 10,
+  boxShadow: '0 3px 0 var(--pc-ink)',
 };
 
 const startHintStyle: CSSProperties = {
   margin: 0,
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 7,
+  padding: '5px 12px',
+  borderRadius: 3,
+  background: 'rgba(174,210,74,0.10)',
+  border: '1px solid rgba(174,210,74,0.34)',
   fontFamily: "'Inter Tight', system-ui, sans-serif",
-  fontSize: 10.5,
+  fontSize: 11,
   fontWeight: 700,
-  letterSpacing: '0.18em',
+  letterSpacing: '0.14em',
   textTransform: 'uppercase',
-  color: 'var(--pc-text3)',
+  color: '#aed24a',
 };
 
 // Live controls (match running)
@@ -1224,9 +1434,7 @@ const tSectionStyle: CSSProperties = {
 };
 
 const tLobbyCardStyle: CSSProperties = {
-  background: 'var(--pc-ink2)',
-  border: '1.5px solid var(--pc-line)',
-  borderRadius: 14,
+  ...consolePanelStyle,
   padding: '18px 18px 16px',
   display: 'flex',
   flexDirection: 'column',

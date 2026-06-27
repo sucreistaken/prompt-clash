@@ -285,6 +285,10 @@ export const dictionaries = {
     roomJoinAsPlayerHint: 'Kendi odanda oynamak istersen',
     roomHostOpenLabel: 'Bu cihazda aç',
     roomOpenStageShort: 'Sahneyi aç',
+    roomReadyEyebrow: 'ODA HAZIR',
+    roomLobbyMascotBubble: 'Linki paylaş — oyuncular gelince başlatırız!',
+    roomCopyCodeLabel: 'Kodu kopyala',
+    roomJoinAsPlayerDesc: 'Bu cihazdan oyuna gir',
     // Audience LOBBY/PLAYER_1_JOINED bekleme ekranı (oyuncular hazır basana kadar)
     audienceWaitingLabel: 'İZLEYİCİ',
     audienceWaitingTitle: 'Oyuncular hazırlanıyor',
@@ -848,6 +852,10 @@ export const dictionaries = {
     roomJoinAsPlayerHint: 'If you want to play in your own room',
     roomHostOpenLabel: 'Open on this device',
     roomOpenStageShort: 'Open stage',
+    roomReadyEyebrow: 'ROOM READY',
+    roomLobbyMascotBubble: "Share the link — we'll start when players join!",
+    roomCopyCodeLabel: 'Copy code',
+    roomJoinAsPlayerDesc: 'Play from this device',
     // Audience LOBBY/PLAYER_1_JOINED waiting screen (until players press READY)
     audienceWaitingLabel: 'AUDIENCE',
     audienceWaitingTitle: 'Players are getting ready',
