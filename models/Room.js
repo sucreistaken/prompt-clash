@@ -34,7 +34,9 @@ const RoomSettingsSchema = new mongoose.Schema(
     rematchEnabled: { type: Boolean, default: true },
     audienceVotingEnabled: { type: Boolean, default: false }, // D-1: opt-in
     roomMode: { type: String, enum: ['DUEL', 'TOURNAMENT'], default: 'DUEL' },
-    tournamentMode: { type: String, enum: ['A', 'B'], default: 'A' }
+    tournamentMode: { type: String, enum: ['A', 'B'], default: 'A' },
+    categoryPool: { type: [String], default: [] },
+    customThemes: { type: [String], default: [] }
   },
   { _id: false }
 );
