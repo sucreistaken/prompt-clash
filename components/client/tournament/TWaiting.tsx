@@ -79,6 +79,7 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
         <AppHeader />
 
         <div
+          className="tw-center"
           style={{
             flex: 1,
             display: 'flex',
@@ -93,11 +94,12 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
             size={100}
             variant={mascotVariant}
             particles={variant === 'complete'}
-            desktopSize={130}
+            desktopSize={160}
           />
 
           {champName && (
             <div
+              className="tw-champ"
               style={{
                 fontFamily: FONT.pixel,
                 fontSize: 22,
@@ -131,6 +133,7 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
 
           {variant === 'groupWait' && (
             <div
+              className="tw-group-title"
               style={{
                 fontFamily: FONT.pixel,
                 fontSize: 22,
@@ -166,6 +169,7 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
           {/* Group-advanced: lime positive title */}
           {variant === 'groupAdvanced' && (
             <div
+              className="tw-group-title"
               style={{
                 fontFamily: FONT.pixel,
                 fontSize: 22,
@@ -179,6 +183,7 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
           )}
 
           <p
+            className="tw-msg"
             style={{
               fontFamily: FONT.mono,
               fontSize: 14,
@@ -206,6 +211,14 @@ export function TWaiting({ variant }: { variant: WaitVariant }) {
           )}
         </div>
       </main>
+      <style>{`
+        @media (min-width: 960px) {
+          .tw-center { gap: 28px !important; max-width: 560px; margin-left: auto; margin-right: auto; }
+          .tw-champ { font-size: 32px !important; }
+          .tw-group-title { font-size: 32px !important; }
+          .tw-msg { font-size: 18px !important; max-width: 36ch !important; }
+        }
+      `}</style>
     </>
   );
 }

@@ -50,6 +50,7 @@ export function TEliminated() {
 
         {/* Center area */}
         <div
+          className="te-center"
           style={{
             flex: 1,
             display: 'flex',
@@ -63,11 +64,12 @@ export function TEliminated() {
           <MascotFrame
             size={90}
             variant="dim"
-            desktopSize={115}
+            desktopSize={144}
           />
 
           {/* Title */}
           <div
+            className="te-title"
             style={{
               fontFamily: FONT.pixel,
               fontSize: 22,
@@ -116,6 +118,7 @@ export function TEliminated() {
                   {t('tPassedScore')}
                 </span>
                 <span
+                  className="te-score-num"
                   style={{
                     fontFamily: FONT.pixel,
                     fontSize: 38,
@@ -200,6 +203,13 @@ export function TEliminated() {
           </p>
         </div>
       </main>
+      <style>{`
+        @media (min-width: 960px) {
+          .te-center { gap: 26px !important; max-width: 520px; margin-left: auto; margin-right: auto; }
+          .te-title { font-size: 32px !important; }
+          .te-score-num { font-size: 54px !important; }
+        }
+      `}</style>
     </>
   );
 }

@@ -73,6 +73,7 @@ export function TJoin() {
 
         {/* Center area */}
         <div
+          className="tj-center"
           style={{
             flex: 1,
             display: 'flex',
@@ -88,11 +89,12 @@ export function TJoin() {
             variant="default"
             particles
             label={i18n('tJoinLobbyLabel')}
-            desktopSize={120}
+            desktopSize={154}
           />
 
           {/* Title */}
           <div
+            className="tj-title"
             style={{
               fontFamily: FONT.pixel,
               fontSize: 13,
@@ -106,6 +108,7 @@ export function TJoin() {
 
           {/* Player count pill */}
           <div
+            className="tj-count"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -200,6 +203,13 @@ export function TJoin() {
           )}
         </div>
       </main>
+      <style>{`
+        @media (min-width: 960px) {
+          .tj-center { gap: 28px !important; max-width: 560px; margin-left: auto; margin-right: auto; }
+          .tj-title { font-size: 20px !important; }
+          .tj-count { font-size: 16px !important; padding: 8px 20px !important; }
+        }
+      `}</style>
     </>
   );
 }

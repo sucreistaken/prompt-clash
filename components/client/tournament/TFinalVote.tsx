@@ -44,6 +44,7 @@ export function TFinalVote() {
       <StageKeyframes />
       <BgAtmosphere variant="default" />
       <main
+        className="tfv-root"
         style={{
           position: 'relative',
           zIndex: 1,
@@ -101,6 +102,7 @@ export function TFinalVote() {
           {/* Title */}
           <div style={{ textAlign: 'center' }}>
             <div
+              className="tfv-title"
               style={{
                 fontFamily: FONT.pixel,
                 fontSize: 13,
@@ -125,6 +127,7 @@ export function TFinalVote() {
 
           {/* Finalist cards */}
           <div
+            className="tfv-cards"
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -243,6 +246,11 @@ export function TFinalVote() {
           @keyframes pcPulseSoft {
             0%, 100% { transform: scale(1); opacity: 1; }
             50%       { transform: scale(1.04); opacity: 0.9; }
+          }
+          @media (min-width: 960px) {
+            .tfv-root { max-width: 680px; margin-left: auto; margin-right: auto; }
+            .tfv-title { font-size: 18px !important; }
+            .tfv-cards { gap: 16px !important; }
           }
         `}</style>
       </main>

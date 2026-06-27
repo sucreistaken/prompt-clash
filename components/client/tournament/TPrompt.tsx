@@ -50,6 +50,7 @@ export function TPrompt() {
       <StageKeyframes />
       <BgAtmosphere variant="default" />
       <main
+        className="tpr-root"
         style={{
           position: 'relative',
           zIndex: 1,
@@ -140,6 +141,7 @@ export function TPrompt() {
             <span
               role="timer"
               aria-live="polite"
+              className="tpr-timer"
               style={{
                 fontFamily: FONT.mono,
                 fontSize: 15,
@@ -181,6 +183,7 @@ export function TPrompt() {
               <span style={{ display: 'inline-block', width: 28, height: 1, background: C.line }} />
             </span>
             <div
+              className="tpr-topic"
               style={{
                 fontFamily: FONT.pixel,
                 fontSize: 16,
@@ -318,6 +321,11 @@ export function TPrompt() {
           @keyframes pcPulseSoft {
             0%, 100% { transform: scale(1); opacity: 1; }
             50%       { transform: scale(1.04); opacity: 0.9; }
+          }
+          @media (min-width: 960px) {
+            .tpr-root { max-width: 720px; margin-left: auto; margin-right: auto; }
+            .tpr-topic { font-size: 24px !important; }
+            .tpr-timer { font-size: 22px !important; }
           }
         `}</style>
       </main>

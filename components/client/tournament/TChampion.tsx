@@ -43,6 +43,7 @@ export function TChampion() {
 
         {/* Center area */}
         <div
+          className="tc-center"
           style={{
             flex: 1,
             display: 'flex',
@@ -73,7 +74,7 @@ export function TChampion() {
             size={100}
             variant="lime"
             particles
-            desktopSize={130}
+            desktopSize={160}
           />
 
           {/* Champion label */}
@@ -92,6 +93,7 @@ export function TChampion() {
           {/* Champion name */}
           {champion ? (
             <div
+              className="tc-name"
               style={{
                 fontFamily: FONT.pixel,
                 fontSize: 30,
@@ -152,6 +154,12 @@ export function TChampion() {
           </p>
         </div>
       </main>
+      <style>{`
+        @media (min-width: 960px) {
+          .tc-center { gap: 28px !important; max-width: 560px; margin-left: auto; margin-right: auto; }
+          .tc-name { font-size: 44px !important; }
+        }
+      `}</style>
     </>
   );
 }

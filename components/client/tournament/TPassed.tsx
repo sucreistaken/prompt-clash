@@ -50,6 +50,7 @@ export function TPassed() {
 
         {/* Center area */}
         <div
+          className="tp-center"
           style={{
             flex: 1,
             display: 'flex',
@@ -65,11 +66,12 @@ export function TPassed() {
             variant="lime"
             particles
             label={t('tPassedMascotLabel')}
-            desktopSize={130}
+            desktopSize={160}
           />
 
           {/* Main title */}
           <div
+            className="tp-title"
             style={{
               fontFamily: FONT.pixel,
               fontSize: 28,
@@ -147,6 +149,7 @@ export function TPassed() {
                 {t('tPassedScore')}
               </span>
               <span
+                className="tp-score-num"
                 style={{
                   fontFamily: FONT.pixel,
                   fontSize: 48,
@@ -179,6 +182,7 @@ export function TPassed() {
 
           {/* Next round hint */}
           <p
+            className="tp-body-text"
             style={{
               fontFamily: FONT.mono,
               fontSize: 13,
@@ -192,6 +196,14 @@ export function TPassed() {
           </p>
         </div>
       </main>
+      <style>{`
+        @media (min-width: 960px) {
+          .tp-center { gap: 28px !important; max-width: 560px; margin-left: auto; margin-right: auto; }
+          .tp-title { font-size: 40px !important; }
+          .tp-score-num { font-size: 68px !important; }
+          .tp-body-text { font-size: 16px !important; max-width: 36ch !important; }
+        }
+      `}</style>
     </>
   );
 }
