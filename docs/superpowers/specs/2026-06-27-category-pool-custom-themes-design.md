@@ -100,10 +100,27 @@ gösterilir; `categoryLabel` custom için metni döndürür.
   erişilebilir etiketli.
 - `npm run typecheck` (CI deploy gate) ve mevcut smoke akışı bozulmaz.
 
+## Yeni hazır kategoriler (kapsam içi)
+
+`lib/game/targetPrompt.js` `CATEGORIES` listesine yeni temalar eklenir; her biri mevcut
+`{code, labelTr, seeds[]}` şeklinde 5 küratörlü seed ile. Bunlar otomatik olarak hem Rastgele
+modunda hem "Sen seç" havuz chip'lerinde belirir (ekstra UI işi yok — veri-odaklı).
+
+Eklenecekler (host onayıyla budanabilir):
+- `backrooms` — **BACKROOMS** (istendi). Seeds: liminal sarı ofis koridoru, vızıldayan flüoresan
+  + nemli halı, su basmış backrooms katı, sonsuz aynı kapılı merdiven boşluğu, gece ıssız AVM.
+- `horror` — **KORKU** (şu an yok). Seeds: terk edilmiş hastane koridoru, sisli orman evi,
+  yanan mum ışığında bir gölge, eski bir lunaparkın enkazı, çatı katında tek sandalye.
+- `anime` — **ANİME**. Seeds: çatıda gün batımı sahnesi, sakura altında düello, mecha hangarı,
+  kedili büyücü dükkânı, yağmurda neon sokak.
+- `memes` — **İNTERNET / MEME**. Seeds: alakasız iki nesnenin absürt birleşimi (mizah tonu),
+  abartılı tepki anı, "this is fine" tarzı sahne, kötü çizilmiş kahraman, ironik kurumsal stok görsel.
+
+Not: `horror`/`anime`/`memes` öneri; host plan incelemesinde çıkarabilir. `backrooms` sabit.
+
 ## Kapsam dışı
 
 - Oyuncu oyu (canlı tur-içi oylama fazı) — ayrı dilim.
-- Yeni *hazır* kategori eklemek — trivial veri eki; istenirse aynı PR'da yapılır, tasarımın parçası değil.
 - Custom temaya zorluk/ekstra ayar — bu dilimde sadece metin.
 
 ## Açık riskler
