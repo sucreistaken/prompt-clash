@@ -3,6 +3,7 @@
 
 import type { Metadata } from 'next';
 import { CreateRoomFormClient } from './CreateRoomFormClient';
+import { CATEGORIES } from '@/lib/game/targetPrompt.js';
 
 export const metadata: Metadata = {
   title: 'Yeni Oda · Prompt Clash',
@@ -12,5 +13,9 @@ export const metadata: Metadata = {
 };
 
 export default function CreateRoomPage() {
-  return <CreateRoomFormClient />;
+  const categories = (CATEGORIES as Array<{ code: string; labelTr: string }>).map((c) => ({
+    code: c.code,
+    labelTr: c.labelTr
+  }));
+  return <CreateRoomFormClient categories={categories} />;
 }

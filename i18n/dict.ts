@@ -248,6 +248,14 @@ export const dictionaries = {
     createRoomInvalid: 'Form geçersiz. Lütfen alanları kontrol et.',
     createRoomRateLimited: 'Saatlik oda oluşturma sınırı aşıldı. Sonra tekrar dene.',
     createRoomFailed: 'Oda oluşturulamadı. Tekrar dene.',
+    createRoomPoolBuiltinLabel: 'Hazır temalar',
+    createRoomPoolCustomLabel: 'Kendi temaların',
+    createRoomThemePlaceholder: 'tema yaz — örn. uzayda kediler',
+    createRoomThemeAdd: 'Ekle',
+    createRoomThemeRemove: 'Temayı kaldır',
+    createRoomPoolEmptyHint: 'Havuz boş — rastgele oynanır.',
+    createRoomPoolLimitHint: 'En fazla 8 tema, her biri 2–60 karakter.',
+    createRoomModeSoon: 'Yakında',
 
     // Story 1.9 — control panel
     roomCodeLabel: 'Oda kodu',
@@ -803,6 +811,14 @@ export const dictionaries = {
     createRoomInvalid: 'Form is invalid. Please check the fields.',
     createRoomRateLimited: 'Hourly room create limit reached. Try again shortly.',
     createRoomFailed: 'Could not create room. Try again.',
+    createRoomPoolBuiltinLabel: 'Built-in themes',
+    createRoomPoolCustomLabel: 'Your themes',
+    createRoomThemePlaceholder: 'type a theme — e.g. cats in space',
+    createRoomThemeAdd: 'Add',
+    createRoomThemeRemove: 'Remove theme',
+    createRoomPoolEmptyHint: 'Pool empty — plays random.',
+    createRoomPoolLimitHint: 'Up to 8 themes, 2–60 chars each.',
+    createRoomModeSoon: 'Soon',
 
     // Story 1.9 — control panel
     roomCodeLabel: 'Room code',

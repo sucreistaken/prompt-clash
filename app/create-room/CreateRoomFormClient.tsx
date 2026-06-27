@@ -23,6 +23,8 @@ type RoomDraft = {
   roomMode: RoomMode;
   tournamentMode: TournamentMode;
   categoryMode: CategoryMode;
+  categoryPool: string[];
+  customThemes: string[];
   audienceEnabled: boolean;
   promptDuration: number;
   votingDuration: number;
@@ -37,6 +39,8 @@ const DEFAULTS: RoomDraft = {
   roomMode: 'DUEL',
   tournamentMode: 'A',
   categoryMode: 'RANDOM',
+  categoryPool: [],
+  customThemes: [],
   audienceEnabled: true,
   promptDuration: 60,
   votingDuration: 15,
@@ -47,25 +51,53 @@ const DEFAULTS: RoomDraft = {
   audienceVotingEnabled: false,
 };
 
-export function CreateRoomFormClient() {
+type CategoryOption = { code: string; labelTr: string };
+
+export function CreateRoomFormClient({ categories }: { categories: CategoryOption[] }) {
   return (
     <I18nProvider>
-      <CreateRoomBody />
+      <CreateRoomBody categories={categories} />
     </I18nProvider>
   );
 }
 
-function CreateRoomBody() {
+function CreateRoomBody({ categories }: { categories: CategoryOption[] }) {
   const { t } = useI18n();
   const router = useRouter();
   const [draft, setDraft] = useState<RoomDraft>(DEFAULTS);
   const [advanced, setAdvanced] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [themeInput, setThemeInput] = useState('');
 
   function set<K extends keyof RoomDraft>(key: K, val: RoomDraft[K]) {
     setDraft((d) => ({ ...d, [key]: val }));
   }
+
+  function toggleCat(code: string) {
+    set(
+      'categoryPool',
+      draft.categoryPool.includes(code)
+        ? draft.categoryPool.filter((c) => c !== code)
+        : [...draft.categoryPool, code]
+    );
+  }
+  function addTheme() {
+    const v = themeInput.trim();
+    if (v.length < 2 || v.length > 60) return;
+    if (draft.customThemes.length >= 8) return;
+    if (draft.customThemes.some((t) => t.toLowerCase() === v.toLowerCase())) {
+      setThemeInput('');
+      return;
+    }
+    set('customThemes', [...draft.customThemes, v]);
+    setThemeInput('');
+  }
+  function removeTheme(t: string) {
+    set('customThemes', draft.customThemes.filter((x) => x !== t));
+  }
+
+  const poolEmpty = draft.categoryPool.length === 0 && draft.customThemes.length === 0;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -221,15 +253,18 @@ function CreateRoomBody() {
               <div role="radiogroup" aria-label={t('createRoomCategoryMode')} style={segStyle}>
                 {(['RANDOM', 'HOST_SELECTED', 'PLAYER_VOTE'] as const).map((mode) => {
                   const on = draft.categoryMode === mode;
+                  const soon = mode === 'PLAYER_VOTE';
                   return (
                     <button
                       key={mode}
                       type="button"
                       role="radio"
                       aria-checked={on}
-                      onClick={() => set('categoryMode', mode)}
+                      aria-disabled={soon}
+                      disabled={soon}
+                      onClick={() => !soon && set('categoryMode', mode)}
                       className="pc-seg-btn"
-                      style={segBtnVisual(on)}
+                      style={{ ...segBtnVisual(on), opacity: soon ? 0.5 : 1, cursor: soon ? 'not-allowed' : 'pointer', position: 'relative' }}
                     >
                       {t(
                         mode === 'RANDOM'
@@ -238,10 +273,85 @@ function CreateRoomBody() {
                             ? 'categoryModeHost'
                             : 'categoryModePlayerVote'
                       )}
+                      {soon ? <span style={soonBadgeStyle}>{t('createRoomModeSoon')}</span> : null}
                     </button>
                   );
                 })}
               </div>
+              {draft.categoryMode === 'HOST_SELECTED' ? (
+                <div style={poolWrapStyle}>
+                  {/* Hazır temalar — aç/kapa chip grid */}
+                  <span style={poolSubLabelStyle}>{t('createRoomPoolBuiltinLabel')}</span>
+                  <div className="cr-chips" role="group" aria-label={t('createRoomPoolBuiltinLabel')}>
+                    {categories.map((c) => {
+                      const on = draft.categoryPool.includes(c.code);
+                      return (
+                        <button
+                          key={c.code}
+                          type="button"
+                          aria-pressed={on}
+                          onClick={() => toggleCat(c.code)}
+                          className="pc-seg-btn"
+                          style={catChipStyle(on)}
+                        >
+                          {c.labelTr}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Kendi temaların — input + chip listesi */}
+                  <span style={poolSubLabelStyle}>{t('createRoomPoolCustomLabel')}</span>
+                  <div style={themeRowStyle}>
+                    <input
+                      type="text"
+                      value={themeInput}
+                      onChange={(e) => setThemeInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          addTheme();
+                        }
+                      }}
+                      maxLength={60}
+                      placeholder={t('createRoomThemePlaceholder')}
+                      className="pc-input"
+                      style={themeInputStyle}
+                      aria-label={t('createRoomPoolCustomLabel')}
+                    />
+                    <button
+                      type="button"
+                      onClick={addTheme}
+                      disabled={draft.customThemes.length >= 8 || themeInput.trim().length < 2}
+                      className="pc-seg-btn"
+                      style={themeAddBtnStyle}
+                    >
+                      {t('createRoomThemeAdd')}
+                    </button>
+                  </div>
+                  {draft.customThemes.length > 0 ? (
+                    <div className="cr-chips">
+                      {draft.customThemes.map((tm) => (
+                        <span key={tm} style={themeChipStyle}>
+                          {tm}
+                          <button
+                            type="button"
+                            onClick={() => removeTheme(tm)}
+                            aria-label={t('createRoomThemeRemove')}
+                            style={themeChipXStyle}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <span style={rowDescStyle}>
+                    {poolEmpty ? t('createRoomPoolEmptyHint') : t('createRoomPoolLimitHint')}
+                  </span>
+                </div>
+              ) : null}
             </div>
 
             {/* audienceEnabled (always visible, before Advanced) */}
@@ -367,6 +477,7 @@ function CreateRoomBody() {
         .pc-adv-trig { transition: border-color .14s, background .14s; }
         .pc-adv-trig:hover { border-color: var(--pc-line2); background: var(--pc-ink2); }
         .pc-adv-trig:hover .pc-adv-box { border-color: var(--pc-accent); }
+        .cr-chips { display: flex; flex-wrap: wrap; gap: 6px; }
         @media (min-width: 880px) {
           .cr-grid { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: 36px; align-items: center; margin-top: 18px; }
           .cr-intro { align-items: flex-start; text-align: left; gap: 10px; }
@@ -838,4 +949,117 @@ const ctaArrowStyle: CSSProperties = {
   fontSize: 18,
   fontWeight: 800,
   lineHeight: 1,
+};
+
+const poolWrapStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 8,
+  marginTop: 8,
+  padding: '12px 12px 10px',
+  border: '2px solid var(--pc-line)',
+  borderRadius: 4,
+  background: 'rgba(0,0,0,0.14)',
+};
+
+const poolSubLabelStyle: CSSProperties = {
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 10.5,
+  fontWeight: 700,
+  letterSpacing: '0.18em',
+  textTransform: 'uppercase',
+  color: 'var(--pc-text2)',
+  marginTop: 2,
+};
+
+function catChipStyle(on: boolean): CSSProperties {
+  return {
+    fontFamily: "'Inter Tight', system-ui, sans-serif",
+    fontSize: 11.5,
+    fontWeight: 700,
+    padding: '8px 10px',
+    borderRadius: 3,
+    lineHeight: 1.1,
+    cursor: 'pointer',
+    background: on ? 'var(--pc-accent)' : 'var(--pc-ink3)',
+    color: on ? '#fff' : 'var(--pc-text2)',
+    border: `1px solid ${on ? 'var(--pc-bone)' : 'var(--pc-line)'}`,
+    boxShadow: on ? 'inset 0 -2px 0 #5a35cc' : '0 2px 0 var(--pc-ink)',
+  };
+}
+
+const themeRowStyle: CSSProperties = {
+  display: 'flex',
+  gap: 6,
+  alignItems: 'stretch',
+};
+
+const themeInputStyle: CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+  minHeight: 44,
+  borderRadius: 4,
+  background: 'var(--pc-ink)',
+  border: '2px solid var(--pc-line2)',
+  color: 'var(--pc-bone)',
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 14,
+  padding: '0 12px',
+  outline: 'none',
+};
+
+const themeAddBtnStyle: CSSProperties = {
+  flex: 'none',
+  padding: '0 16px',
+  minHeight: 44,
+  borderRadius: 4,
+  background: 'var(--pc-ink3)',
+  color: 'var(--pc-bone)',
+  border: '1px solid var(--pc-line)',
+  boxShadow: '0 2px 0 var(--pc-ink)',
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 12.5,
+  fontWeight: 700,
+  cursor: 'pointer',
+};
+
+const themeChipStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '6px 6px 6px 10px',
+  borderRadius: 3,
+  background: 'rgba(124,77,255,0.14)',
+  border: '1px solid rgba(124,77,255,0.42)',
+  color: 'var(--pc-bone)',
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 12,
+  fontWeight: 600,
+};
+
+const themeChipXStyle: CSSProperties = {
+  display: 'grid',
+  placeItems: 'center',
+  width: 18,
+  height: 18,
+  borderRadius: 2,
+  border: 'none',
+  background: 'rgba(0,0,0,0.25)',
+  color: 'var(--pc-bone)',
+  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+  fontSize: 14,
+  lineHeight: 1,
+  cursor: 'pointer',
+};
+
+const soonBadgeStyle: CSSProperties = {
+  position: 'absolute',
+  top: 3,
+  right: 4,
+  fontFamily: "'Inter Tight', system-ui, sans-serif",
+  fontSize: 7.5,
+  fontWeight: 800,
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase',
+  color: 'var(--pc-text3)',
 };
