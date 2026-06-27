@@ -57,6 +57,7 @@ export function buildMock(phase: Phase): {
     votes: null,
     winner: null,
     aiReasoning: null,
+    aiReasoningTr: null,
     durations,
   };
   const live = { A: '', B: '' };
@@ -96,13 +97,18 @@ export function buildMock(phase: Phase): {
       base.votes = { A: 47, B: 35 };
       break;
     case 'RESULT':
+      base.winnerMode = 'AI_SCORE';
       base.players = {
-        A: player('alice', { submitted: true, prompt: PROMPT_A, imageUrl: IMG_A }),
-        B: player('bob', { submitted: true, prompt: PROMPT_B, imageUrl: IMG_B }),
+        A: player('alice', { submitted: true, prompt: PROMPT_A, imageUrl: IMG_A, aiScore: 85 }),
+        B: player('bob', { submitted: true, prompt: PROMPT_B, imageUrl: IMG_B, aiScore: 72 }),
       };
       base.votes = { A: 54, B: 33 };
       base.winner = 'A';
-      base.phaseEndsAt = null;
+      base.aiReasoning =
+        "Alice's image captured the reference's symmetry and dramatic top light noticeably better than Bob's.";
+      base.aiReasoningTr =
+        "Alice'in görseli referanstaki simetri ve dramatik tepe ışığını Bob'unkine göre belirgin biçimde daha iyi yakaladı.";
+      base.phaseEndsAt = Date.now() + 8000;
       break;
     default:
       break;

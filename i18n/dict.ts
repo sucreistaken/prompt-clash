@@ -182,8 +182,10 @@ export const dictionaries = {
     audienceHedefShort: 'REFERANS',
     audienceWinnerBadge: 'KAZANAN',
     audienceLoserBadge: 'KAYBEDEN',
-    audienceWinnerHeroLabel: 'AI SCORE · KAZANAN',
+    audienceWinnerHeroLabel: 'AI SKORU · KAZANAN',
     audienceNextMatchSoon: 'Sonraki maç birazdan',
+    resultNextMatchLabel: 'Sıradaki maç',
+    resultPromptByTpl: "{name}'in promptu",
     audiencePromptByTpl: '{name} · PROMPT',
 
     // ─── prompting screen redesign (2026-05-30, desktop + responsive) ───
@@ -751,6 +753,8 @@ export const dictionaries = {
     audienceLoserBadge: 'LOSER',
     audienceWinnerHeroLabel: 'AI SCORE · WINNER',
     audienceNextMatchSoon: 'Next match soon',
+    resultNextMatchLabel: 'Next match',
+    resultPromptByTpl: "{name}'s prompt",
     audiencePromptByTpl: "{name} · PROMPT",
 
     // ─── prompting screen redesign (2026-05-30, desktop + responsive) ───

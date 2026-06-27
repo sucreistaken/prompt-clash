@@ -79,6 +79,7 @@ export interface StateSnapshot {
   votes: { A: number; B: number } | null;
   winner: Slot | 'TIE' | null;
   aiReasoning: string | null;
+  aiReasoningTr: string | null;
   durations: {
     promptDurationSec: number;
     votingDurationSec: number;

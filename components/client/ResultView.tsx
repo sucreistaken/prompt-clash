@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type CSSProperties } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { useGameState } from './useGameState';
 import { useI18n } from './i18nContext';
 import { C, FONT, StageFonts, StageKeyframes } from '@/components/stage/atmosphere';
@@ -13,7 +13,7 @@ import type { DictKey } from '@/i18n/dict';
  * 3 saniyede maça hakim ol: hedef + kazanan + kaybeden tek bakışta.
  */
 export function ResultView() {
-  const { state, mySlot } = useGameState();
+  const { state } = useGameState();
   const { t, lang } = useI18n();
   const [showDetails, setShowDetails] = useState(false);
 
@@ -23,6 +23,13 @@ export function ResultView() {
     (lang === 'tr' ? state.targetPromptTr : state.targetPrompt) ||
     state.targetPrompt ||
     state.targetPromptTr;
+
+  // Dil-bilinçli AI değerlendirmesi: TR seçiliyse TR metin, yoksa diğerine düşer.
+  const reasoningText =
+    (lang === 'tr' ? state.aiReasoningTr : state.aiReasoning) ||
+    state.aiReasoning ||
+    state.aiReasoningTr ||
+    '';
 
   const isTie = state.winner === 'TIE';
   const winnerSlot: Slot | null = state.winner === 'A' ? 'A' : state.winner === 'B' ? 'B' : null;
@@ -89,8 +96,8 @@ export function ResultView() {
               truePrompt={truePromptText ?? ''}
             />
           )}
-          {aiMode && state.aiReasoning && <AiReasoning t={t} text={state.aiReasoning} />}
-          <Cta t={t} mySlot={mySlot} winnerColor={winnerColor} />
+          {aiMode && reasoningText && <AiReasoning t={t} text={reasoningText} accent={winnerColor} />}
+          <Cta t={t} winnerColor={winnerColor} endsAt={state.phaseEndsAt} totalSeconds={state.durations.resultDurationSec} />
         </div>
 
         {/* MOBILE — kazanan büyük + hedef sağ üst + kaybeden mini */}
@@ -126,7 +133,7 @@ export function ResultView() {
               />
             )
           )}
-          {aiMode && state.aiReasoning && <AiReasoning t={t} text={state.aiReasoning} compact />}
+          {aiMode && reasoningText && <AiReasoning t={t} text={reasoningText} accent={winnerColor} compact />}
           {!isTie && (truePromptText || (loser && loserSlot)) && (
             <div style={{ width: '100%', marginTop: 10 }}>
               <button
@@ -169,7 +176,7 @@ export function ResultView() {
               )}
             </div>
           )}
-          <Cta t={t} mySlot={mySlot} winnerColor={winnerColor} />
+          <Cta t={t} winnerColor={winnerColor} endsAt={state.phaseEndsAt} totalSeconds={state.durations.resultDurationSec} compact />
         </div>
       </main>
     </>
@@ -397,35 +404,34 @@ function ArenaCardDesktop({
         flexDirection: 'column',
         gap: 10,
         minWidth: 0,
-        opacity: isWinner ? 1 : 0.55,
-        filter: isWinner ? 'none' : 'grayscale(0.4)',
+        opacity: isWinner ? 1 : 0.82,
+        filter: isWinner ? 'none' : 'grayscale(0.12)',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <span
           style={{
-            fontFamily: FONT.pixel,
-            fontSize: 13,
-            letterSpacing: '0.06em',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 8,
+            gap: 9,
             minWidth: 0,
             flex: 1,
           }}
         >
-          <span style={{ color: slotColor, fontSize: 14 }}>{slot}</span>
-          <span style={{ color: C.text4, fontSize: 11 }}>·</span>
+          <span style={{ width: 11, height: 11, borderRadius: 3, background: slotColor, flexShrink: 0 }} />
           <span
             style={{
-              color: C.bone,
+              fontFamily: FONT.body,
+              fontWeight: 800,
+              fontSize: 17,
+              color: isWinner ? C.bone : C.text2,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
               minWidth: 0,
             }}
           >
-            {nick.toUpperCase()}
+            {nick}
           </span>
         </span>
         <span
@@ -450,9 +456,30 @@ function ArenaCardDesktop({
           aspectRatio: '1 / 1',
           background: '#15141b',
           overflow: 'hidden',
-          border: `1.5px solid ${isWinner ? slotColor : C.line}`,
+          border: isWinner ? `2.5px solid ${slotColor}` : `1.5px solid ${C.line}`,
+          boxShadow: isWinner
+            ? `0 0 0 1px ${slotColor}, 0 16px 50px -12px color-mix(in srgb, ${slotColor} 55%, transparent)`
+            : 'none',
         }}
       >
+        {isWinner && (
+          <span
+            style={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              zIndex: 2,
+              fontFamily: FONT.pixel,
+              fontSize: 11,
+              letterSpacing: '0.06em',
+              background: slotColor,
+              color: C.playerInk(slot),
+              padding: '4px 9px',
+            }}
+          >
+            ★ 1.
+          </span>
+        )}
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -495,22 +522,35 @@ function ArenaCardDesktop({
         </span>
       </div>
       {prompt !== undefined && (
-        <div
-          style={{
-            fontFamily: FONT.mono,
-            fontSize: 11,
-            lineHeight: 1.5,
-            color: isWinner ? C.text2 : C.text3,
-            borderLeft: `2px solid ${isWinner ? slotColor : C.line}`,
-            paddingLeft: 9,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            wordBreak: 'break-word',
-          }}
-        >
-          {prompt || '—'}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <span
+            style={{
+              fontFamily: FONT.mono,
+              fontSize: 9,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: C.text4,
+            }}
+          >
+            {t('resultPromptByTpl').replace('{name}', nick)}
+          </span>
+          <div
+            style={{
+              fontFamily: FONT.mono,
+              fontSize: 13,
+              lineHeight: 1.55,
+              color: isWinner ? C.text : C.text2,
+              borderLeft: `2px solid ${isWinner ? slotColor : C.line}`,
+              paddingLeft: 11,
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              wordBreak: 'break-word',
+            }}
+          >
+            {prompt || '—'}
+          </div>
         </div>
       )}
     </div>
@@ -551,10 +591,11 @@ function HedefBlockDesktop({
       <div
         style={{
           position: 'relative',
-          width: 240,
-          height: 240,
+          width: 340,
+          height: 340,
           background: '#0f0e14',
           border: `1.5px solid color-mix(in srgb, ${C.accent} 55%, transparent)`,
+          boxShadow: '0 24px 64px -20px rgba(0,0,0,0.65)',
           overflow: 'hidden',
         }}
       >
@@ -572,17 +613,27 @@ function HedefBlockDesktop({
         })}
       </div>
       {truePrompt ? (
-        <div style={{ width: 240, display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
-          <span style={{ fontFamily: FONT.mono, fontSize: 8.5, letterSpacing: '0.20em', textTransform: 'uppercase', color: C.accent }}>{truePromptLabel}</span>
+        <div
+          style={{
+            width: 340,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+            background: `color-mix(in srgb, ${C.accent} 10%, transparent)`,
+            border: `1px solid ${C.accent}`,
+            borderLeft: `4px solid ${C.accent}`,
+            padding: '12px 14px',
+          }}
+        >
+          <span style={{ fontFamily: FONT.pixel, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: C.accent }}>{truePromptLabel}</span>
           <span
             style={{
               fontFamily: FONT.mono,
-              fontSize: 11,
+              fontSize: 13,
               lineHeight: 1.5,
-              color: C.text2,
-              textAlign: 'center',
+              color: C.text,
               display: '-webkit-box',
-              WebkitLineClamp: 2,
+              WebkitLineClamp: 3,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
             }}
@@ -759,12 +810,12 @@ function WinnerHeroMobile({
         <span
           style={{
             fontFamily: FONT.mono,
-            fontSize: 11,
-            lineHeight: 1.5,
-            color: C.text2,
+            fontSize: 13,
+            lineHeight: 1.55,
+            color: C.text,
             overflow: 'hidden',
             display: '-webkit-box',
-            WebkitLineClamp: 2,
+            WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
             wordBreak: 'break-word',
           }}
@@ -933,8 +984,8 @@ function LoserRowMobile({
         background: 'rgba(255,255,255,0.02)',
         border: `1px solid ${C.line}`,
         borderRadius: 8,
-        opacity: 0.55,
-        filter: 'grayscale(0.4)',
+        opacity: 0.82,
+        filter: 'grayscale(0.12)',
         alignItems: 'center',
       }}
     >
@@ -957,19 +1008,18 @@ function LoserRowMobile({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
           <span
             style={{
-              fontFamily: FONT.pixel,
-              fontSize: 10.5,
-              letterSpacing: '0.06em',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 6,
+              gap: 7,
               minWidth: 0,
             }}
           >
-            <span style={{ color: slotColor }}>{slot}</span>
-            <span style={{ color: C.text4, fontSize: 9 }}>·</span>
+            <span style={{ width: 9, height: 9, borderRadius: 2, background: slotColor, flexShrink: 0 }} />
             <span
               style={{
+                fontFamily: FONT.body,
+                fontWeight: 700,
+                fontSize: 13,
                 color: C.text2,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -977,7 +1027,7 @@ function LoserRowMobile({
                 minWidth: 0,
               }}
             >
-              {nick.toUpperCase()}
+              {nick}
             </span>
           </span>
           <span
@@ -995,11 +1045,14 @@ function LoserRowMobile({
         <div
           style={{
             fontFamily: FONT.mono,
-            fontSize: 9.5,
+            fontSize: 11,
+            lineHeight: 1.45,
             color: C.text3,
             overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            wordBreak: 'break-word',
           }}
         >
           {prompt || '—'}
@@ -1058,26 +1111,36 @@ function TrueBlock({ t, text, compact = false }: { t: (k: DictKey) => string; te
   );
 }
 
-function AiReasoning({ t, text, compact = false }: { t: (k: DictKey) => string; text: string; compact?: boolean }) {
+function AiReasoning({ t, text, accent = C.accent, compact = false }: { t: (k: DictKey) => string; text: string; accent?: string; compact?: boolean }) {
+  // Kompakt "verdict": dar, kazanan renginde sol-border, kartlara yakın. Eski geniş
+  // boş kutu yerine sonuç açıklaması gibi durur.
   return (
     <div
       style={{
-        marginTop: compact ? 10 : 14,
+        marginTop: compact ? 10 : 18,
         width: '100%',
-        maxWidth: compact ? undefined : 1060,
+        maxWidth: compact ? undefined : 760,
+        marginLeft: 'auto',
+        marginRight: 'auto',
         background: C.ink2,
         border: `1px solid ${C.line}`,
-        borderRadius: 10,
-        padding: compact ? '10px 12px' : '12px 16px',
+        borderLeft: `4px solid ${accent}`,
+        display: 'flex',
+        flexDirection: compact ? 'column' : 'row',
+        alignItems: compact ? 'flex-start' : 'baseline',
+        gap: compact ? 5 : 16,
+        padding: compact ? '11px 13px' : '14px 18px',
       }}
     >
       <span
         style={{
-          fontFamily: FONT.mono,
-          fontSize: compact ? 9 : 10,
-          letterSpacing: '0.22em',
+          fontFamily: FONT.pixel,
+          fontSize: compact ? 9 : 11,
+          letterSpacing: '0.16em',
           textTransform: 'uppercase',
-          color: C.text3,
+          color: accent,
+          flexShrink: 0,
+          whiteSpace: 'nowrap',
         }}
       >
         {t('aiEvaluation').toUpperCase()}
@@ -1085,10 +1148,9 @@ function AiReasoning({ t, text, compact = false }: { t: (k: DictKey) => string; 
       <p
         style={{
           fontFamily: FONT.body,
-          fontSize: compact ? 12 : 13,
+          fontSize: compact ? 13 : 15,
           lineHeight: 1.55,
           color: C.text2,
-          marginTop: 6,
         }}
       >
         {text}
@@ -1097,39 +1159,113 @@ function AiReasoning({ t, text, compact = false }: { t: (k: DictKey) => string; 
   );
 }
 
-function Cta({ t, mySlot, winnerColor }: { t: (k: DictKey) => string; mySlot: Slot | null; winnerColor: string }) {
-  // Player + audience aynı countdown'u görür. Rematch lifecycle'ı arka planda
-  // RESULT → LOBBY geçişini yapıyor; oyuncu sayfada kalıyor ve LOBBY açıldığında
-  // ReadyCheckView devralıyor. "Tekrar Oyna" butonu (landing'e yönlendiren)
-  // kaldırıldı — aynı odada akıl yürüten bir UX değildi.
-  void mySlot;
-  void winnerColor;
+function Cta({
+  t,
+  winnerColor,
+  endsAt,
+  totalSeconds,
+  compact = false,
+}: {
+  t: (k: DictKey) => string;
+  winnerColor: string;
+  endsAt: number | null;
+  totalSeconds: number;
+  compact?: boolean;
+}) {
+  // Player + audience aynı geri sayımı görür. Rematch lifecycle'ı arka planda
+  // RESULT → LOBBY geçişini yapıyor; süre dolunca sonraki maç başlar.
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    if (!endsAt) return;
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(id);
+  }, [endsAt]);
+
+  const remainingSec =
+    endsAt && now ? Math.max(0, Math.ceil((endsAt - now) / 1000)) : null;
+  const progress =
+    endsAt && now && totalSeconds > 0
+      ? Math.max(0, Math.min(1, (endsAt - now) / (totalSeconds * 1000)))
+      : 1;
+
+  const ring = compact ? 44 : 54;
+  const stroke = compact ? 5 : 6;
+  const r = (ring - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+
   return (
     <div
       style={{
-        marginTop: 'auto',
-        paddingTop: 14,
+        marginTop: compact ? 14 : 18,
+        paddingTop: 6,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 9,
+        gap: 13,
       }}
     >
-      <span
-        className="ac-live-dot"
-        style={{ width: 5, height: 5, borderRadius: '50%', background: C.accent, display: 'inline-block' }}
-      />
-      <span
-        style={{
-          fontFamily: FONT.mono,
-          fontSize: 10.5,
-          letterSpacing: '0.22em',
-          textTransform: 'uppercase',
-          color: C.text3,
-        }}
-      >
-        {t('audienceNextMatchSoon')}
-      </span>
+      {remainingSec !== null ? (
+        <div style={{ position: 'relative', width: ring, height: ring, flexShrink: 0 }}>
+          <svg width={ring} height={ring} style={{ transform: 'rotate(-90deg)' }} aria-hidden="true">
+            <circle cx={ring / 2} cy={ring / 2} r={r} fill="none" stroke={C.ink3} strokeWidth={stroke} />
+            <circle
+              cx={ring / 2}
+              cy={ring / 2}
+              r={r}
+              fill="none"
+              stroke={winnerColor}
+              strokeWidth={stroke}
+              strokeLinecap="round"
+              strokeDasharray={circ}
+              strokeDashoffset={circ * (1 - progress)}
+              style={{ transition: 'stroke-dashoffset 250ms linear' }}
+            />
+          </svg>
+          <span
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'grid',
+              placeItems: 'center',
+              fontFamily: FONT.pixel,
+              fontSize: compact ? 13 : 16,
+              color: winnerColor,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {remainingSec}
+          </span>
+        </div>
+      ) : (
+        <span
+          className="ac-live-dot"
+          style={{ width: 5, height: 5, borderRadius: '50%', background: winnerColor, display: 'inline-block' }}
+        />
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span
+          style={{
+            fontFamily: FONT.pixel,
+            fontSize: compact ? 12 : 15,
+            letterSpacing: '0.04em',
+            color: C.text,
+          }}
+        >
+          {t('resultNextMatchLabel').toUpperCase()}
+        </span>
+        <span
+          style={{
+            fontFamily: FONT.mono,
+            fontSize: compact ? 9 : 10,
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: C.text3,
+          }}
+        >
+          {t('audienceNextMatchSoon')}
+        </span>
+      </div>
     </div>
   );
 }
