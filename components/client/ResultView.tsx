@@ -542,10 +542,7 @@ function ArenaCardDesktop({
               color: isWinner ? C.text : C.text2,
               borderLeft: `2px solid ${isWinner ? slotColor : C.line}`,
               paddingLeft: 11,
-              display: '-webkit-box',
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
+              whiteSpace: 'pre-wrap',
               wordBreak: 'break-word',
             }}
           >
@@ -632,10 +629,8 @@ function HedefBlockDesktop({
               fontSize: 13,
               lineHeight: 1.5,
               color: C.text,
-              display: '-webkit-box',
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
             }}
           >
             {truePrompt}
@@ -813,10 +808,7 @@ function WinnerHeroMobile({
             fontSize: 13,
             lineHeight: 1.55,
             color: C.text,
-            overflow: 'hidden',
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
+            whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
           }}
         >
@@ -1048,10 +1040,7 @@ function LoserRowMobile({
             fontSize: 11,
             lineHeight: 1.45,
             color: C.text3,
-            overflow: 'hidden',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
+            whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
           }}
         >
@@ -1098,10 +1087,8 @@ function TrueBlock({ t, text, compact = false }: { t: (k: DictKey) => string; te
           fontSize: compact ? 10.5 : 12.5,
           lineHeight: 1.5,
           color: C.text,
-          overflow: 'hidden',
-          display: '-webkit-box',
-          WebkitLineClamp: compact ? 3 : 2,
-          WebkitBoxOrient: 'vertical',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
           flex: compact ? undefined : 1,
         }}
       >
