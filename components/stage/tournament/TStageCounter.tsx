@@ -94,21 +94,28 @@ function EntrantTile({ entrant }: { entrant: TournamentEntrantSnapshot }) {
 }
 
 export function TStageCounter() {
-  const { tournament } = useGameState();
+  const { state, tournament } = useGameState();
   const { t } = useI18n();
   if (!tournament) return null;
 
   const { activeCount, totalCount, roster, topic, roundIndex, roundCount, mode, groupPhase, currentGroupIndex, groupCount } = tournament;
   const railItems = buildRailItems(totalCount, roundIndex, roundCount);
   const showGroupLabel = mode === 'B' && groupPhase && currentGroupIndex >= 0 && groupCount > 0;
+  const targetSrc = state?.referenceImageUrl ?? null;
+  // Target still generating: round phase open, no countdown started yet, no
+  // reference. Keyed on phaseEndsAt (not just the image) so the last-resort timed
+  // window — reference never arrived — doesn't get stuck on "preparing".
+  const preparing = tournament.phase === 'ROUND_PROMPTING' && !state?.phaseEndsAt && !targetSrc;
 
   return (
     <StageFrame>
       <StageBackdrop />
       <TopBar liveLabel={t('live')} matchId="" />
 
-      {/* Topic strip — shown when a round topic is active */}
-      {topic?.promptTr && (
+      {/* Target strip: "preparing" while the hidden target generates, then the
+          target IMAGE during the round; topic TEXT only on reveal (snapshot gates
+          topic.promptTr to scoring/cut/final/complete). */}
+      {(targetSrc || topic?.promptTr || preparing) && (
         <div
           style={{
             position: 'absolute',
@@ -125,7 +132,7 @@ export function TStageCounter() {
           }}
         >
           <Lbl size={11} color="accent">
-            {t('tPromptTopicLabel')}
+            {topic?.promptTr ? t('tPromptTopicLabel') : t('tPromptTargetLabel')}
           </Lbl>
           <span
             style={{
@@ -135,17 +142,37 @@ export function TStageCounter() {
               background: C.line2,
             }}
           />
-          <span
-            style={{
-              fontFamily: FONT.mono,
-              fontSize: 22,
-              color: C.text,
-              fontWeight: 600,
-              letterSpacing: '0.04em',
-            }}
-          >
-            {topic.promptTr}
-          </span>
+          {topic?.promptTr ? (
+            <span
+              style={{
+                fontFamily: FONT.mono,
+                fontSize: 22,
+                color: C.text,
+                fontWeight: 600,
+                letterSpacing: '0.04em',
+              }}
+            >
+              {topic.promptTr}
+            </span>
+          ) : preparing ? (
+            <span
+              style={{
+                fontFamily: FONT.mono,
+                fontSize: 18,
+                color: C.text2,
+                letterSpacing: '0.04em',
+              }}
+            >
+              {t('tPromptPreparing')}
+            </span>
+          ) : (
+            <img
+              src={targetSrc as string}
+              alt=""
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              style={{ height: 40, width: 40, objectFit: 'cover', borderRadius: 6, border: `1px solid ${C.line2}` }}
+            />
+          )}
         </div>
       )}
 
